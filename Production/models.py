@@ -52,10 +52,11 @@ class Production(models.Model):
             return f'{self.get_process_type_display()}-{self.id}{self.ref_code} ({get_product}__{self.quantity_produced}) '
 
     def save(self, *args, **kwargs):
+        get_coil = self.coil.ref if self.coil is not None else ''
         if self.process_type != "MIXING":
-            self.ref_code = f'{self.id}{self.date.strftime("%m%d%y%s")}'
-        if self.slug is None or self.slug == " ":
-            tmp_slug = f'{self.get_process_type_display()}-{self.id}{self.date.strftime("%m%d%y%s")}'
+            self.ref_code = f'{self.id}{get_coil}'
+        if self.slug is None or self.slug == "":
+            tmp_slug = f'{self.get_process_type_display()}-{self.id}{get_coil}'
             self.slug = slugify(tmp_slug)
         super(Production, self).save(*args, **kwargs)
 

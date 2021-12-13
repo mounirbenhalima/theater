@@ -82,7 +82,7 @@ PERFUMED = (
 )
 
 COIL_STATUS = (
-    ('PENDING_EXTRUSION', "En cours d'extrustion"),
+    ('PENDING_EXTRUSION', "En cours d'extrusion"),
     ('PENDING_DATA', "En attente d'informations"),
     ('IN_STOCK', 'En Stock'),
     ('PENDING_PRINTING', "En cours d'impression"),
