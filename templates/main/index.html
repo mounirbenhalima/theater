@@ -1,0 +1,23 @@
+
+{% block content %}
+
+  {% if request.user.profile.job_position.name == "Administrateur" %}
+    {% include "product/index.html" %}
+  {% elif request.user.profile.job_position.name == "Gérant" %}
+    {% include "production/index_consulting.html" %}
+  {% elif request.user.profile.job_position.name == "Opérateur Extrusion" %}
+    {% include "production/index_extrusion.html" %}
+  {% elif request.user.profile.job_position.name == "Opérateur Impression" %}
+    {% include "production/index_printing.html" %}
+  {% elif request.user.profile.job_position.name == "Opérateur Façonnage" %}
+    {% include "production/index_shaping.html" %}
+  {% elif request.user.profile.job_position.name == "Mélangeur" %}
+    {% include "production/index_mixing.html" %}
+  {% elif request.user.profile.job_position.name == "Gestionnaire de Stock" %}
+    {% include "stock_manager/index.html" %}
+  {% else %}
+    {% include "base/base.html" %}
+  {% endif %}
+
+
+{% endblock %}

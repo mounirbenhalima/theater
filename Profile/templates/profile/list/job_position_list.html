@@ -1,0 +1,40 @@
+{% extends "base/base.html" %}
+{% block title %}
+  Liste des Postes
+{% endblock %}
+{% block content %}
+<div class="container shadow-lg p-3 mb-5 bg-white rounded">
+
+  <div class='text-center mt-3'>
+    <h3>Liste des Poste</h3>
+  </div>
+
+  <a class="btn btn-outline-dark btn-md float-right mb-3" href="{% url 'job-position-create' %}">Ajouter</a>
+
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th style="width: 70%;">Intitulé du Poste</th>
+          <th style="width: 30%;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for job_title in object_list %}
+        <tr>
+          <th>{{ job_title.name }}</th>
+
+          <td class="justify-content-between">
+            <!-- <div class="btn-group" role="group"> -->
+            <a class="btn btn-sm btn-red" href="{{ job_title.get_delete_url }}">Supprimer</a>
+            <a class="btn btn-sm" href="{{ job_title.get_absolute_url }}">Modifier</a>
+            <!-- </div> -->
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+
+{% endblock content %}

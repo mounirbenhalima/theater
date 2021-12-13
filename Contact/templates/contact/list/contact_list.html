@@ -1,0 +1,50 @@
+{% extends "base/base.html" %}
+{% block content %}
+<div class="container shadow-lg p-3 mb-5 bg-white rounded">
+
+  <div class="text-center">
+    <h1>Contacts</h1>
+    <hr>
+  </div>
+
+      <a class="btn btn-outline-dark btn-md float-right mb-3" href="{% url 'contact:add-contact' %}" >Ajouter</a>
+  
+  <div class="table-responsive">
+    <table class="table">
+      <thead class="thead-dark">
+        <tr>
+          <th scope="col" style ="width: 5%;">ID</th>
+          <th scope="col" style ="width: 15%;">Nom</th>
+          <th scope="col" style ="width: 15%;">Prénom</th>
+          <th scope="col" style ="width: 10%;">Type</th>
+          <th scope="col" style ="width: 12%;">Email</th>
+          <th scope="col" style ="width: 13%;">Téléphone</th>
+          <th scope="col" style ="width: 10%;">Adresse</th>
+          <th scope="col" style ="width: 10%;">Wilaya</th>
+          <th scope="col" style ="width: 10%;">Action</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for contact in object_list %}
+        <tr>
+          <th scope="row" class="text-nowrap">{{ contact.id}}</th>
+          <th scope="row" class="text-nowrap">{{ contact.last_name|upper }}</th>
+          <th scope="row" class="text-nowrap">{{ contact.first_name|upper }}</th>
+          <th scope="row" class="text-nowrap">{{ contact.get_contact_type_display|upper }}</th>
+          <th scope="row" class="text-nowrap">{{ contact.email|upper }}</th>
+          <th scope="row" class="text-nowrap">{{ contact.phone_number|upper }}</th>
+          <th scope="row" class="text-nowrap">{{ contact.address|upper }}</th>
+          <th scope="row" class="text-nowrap">{{ contact.wilaya|upper }}</th>
+          <td class="justify-content-between">
+            <div class="btn-group d-flex" role="group">
+              <a href="{{ contact.get_delete_url }}" class="btn btn-danger btn-sm">Supprimer</a>
+              <a href="{{ contact.get_absolute_url }}" class="btn btn-dark btn-sm">Mise A Jour</a>
+            </div>
+          </td>
+        </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+</div>
+{% endblock content %}

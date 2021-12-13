@@ -1,0 +1,68 @@
+{% load static %}
+<nav class="navbar navbar-expand-lg special-color-dark navbar-dark mb-5">
+  <img src="{% static 'default/tay_plast/images/logo.png' %}" width="150" height="40"
+    class="d-inline-block align-top mr-4" alt="" loading="lazy">
+
+  <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNav" aria-controls="navbarNav"
+    aria-expanded="false" aria-label="Toggle navigation">
+    <span class="navbar-toggler-icon"></span>
+  </button>
+
+  <div class="collapse navbar-collapse" id="navbarNav">
+    <ul class="navbar-nav mr-auto">
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'main-index' %}"><i class="fas fa-home"></i> Acceuil</a>
+      </li>
+      {% if request.user.profile.job_position.name == "Administrateur" %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'product:index' %}"><i class="fas fa-user-cog"></i> Administration</a>
+      </li>
+      {% endif %}
+      {% if request.user.profile.job_position.name == "Administrateur" or request.user.profile.job_position.name == "Gérant" %}
+      <li class="nav-item">
+        <a class="nav-link" href=" {% url 'production:index-consulting' %} "><i class="fas fa-chalkboard-teacher"></i> Consultations</a>
+      </li>
+      {% endif %}
+      {% if request.user.profile.job_position.name == "Opérateur Extrusion" %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'production:index-extrusion' %}"><i class="fas fa-atom"></i> Production</a>
+      </li>
+      {% endif %}
+      {% if request.user.profile.job_position.name == "Opérateur Façonnage"%}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'production:index-shaping' %}"><i class="fas fa-atom"></i> Production</a>
+      </li>
+      {% endif %}
+      {% if request.user.profile.job_position.name == "Mélangeur" %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'production:index-mixing' %}"><i class="fas fa-atom"></i> Production</a>
+      </li>
+      {% endif %}
+      {% if request.user.profile.job_position.name == "Gestionnaire de Stock" %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'stock-manager:index' %}"><i class="fas fa-cubes"></i> Gestionnaire de Stock</a>
+      </li>
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'contact:contacts' %}"><i class="fas fa-id-card"></i> Fournisseur/Client</a>
+      </li>
+      {% endif %}
+      {% if request.user.profile.job_position.name != "Administrateur" and request.user.profile.job_position.name != "Gérant" %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'production:index-personnel' %}"><i class="fas fa-user-tie"></i> Personnel</a>
+      </li>
+      {% endif %}
+    </ul>
+    <ul class="navbar-nav ml-auto nav-flex-icons">
+    <li class="nav-item">
+        <p class="nav-link font-weight-bold">{{ request.user.profile.job_position.name}} :</p>
+    </li>
+    <li class="nav-item">
+        <p class="nav-link font-weight-bold">{{ request.user.first_name}} {{ request.user.last_name}}</p>
+    </li>
+      <li class="nav-item">
+        <a class="nav-link font-weight-bold" href="{% url 'logout' %}"><i class="fas fa-sign-out-alt"></i> Se
+          Déconnecter</a>
+    </li>
+    </ul>
+  </div>
+</nav>

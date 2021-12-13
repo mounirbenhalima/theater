@@ -1,0 +1,138 @@
+{% extends "base/base.html" %} {% block content %}
+<main>
+  <div class="container shadow-lg p-3 mb-5 bg-white rounded">
+      <div class="row mt-3">
+        <div class="col-sm-12 col-md-6">
+            <h2>Commande N°: <strong>{{ object.slug }}</strong></h2>
+        </div>
+        <div class="col-sm-12 col-md-6">
+            <a class="btn btn-dark float-right" href="{% url 'stock-manager:invoice' object.slug %}">
+                <i class="fas fa-file-pdf fa-lg "></i> Exporter PDF</a>
+        </div>
+      </div>
+      <div class = "float-left">
+      {% if object.client is not None %}
+        <h4 style="text-align: center"> <label style = "font-weight: bold">Client : </label>{{ object.client }}</h2>
+      {% endif %}
+      {% if object.company is not None %}
+        <h4 style="text-align: center"> <label style = "font-weight: bold">Entreprise : </label>{{ object.company }}</h2>
+      {% endif %}
+      {% if object.supplier is not None %}
+        <h4 style="text-align: center"> <label style = "font-weight: bold">Fournisseur : </label>{{ object.supplier }}</h2>
+      {% endif %}
+      {% if object.intern_user is not None %}
+        <h4 style="text-align: center"> <label style = "font-weight: bold">Opérateur : </label>{{ object.intern_user.first_name }} {{ object.intern_user.last_name }}</h2>
+      {% endif %}
+
+    </div>
+      
+    <div class="table-responsive text-nowrap">
+    <div class"container">
+      <h2 style="text-align: center">{{ object.get_type_order_display }}</h2>
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nom</th>
+            {% if category == "finishedproducttype" %}
+            <th scope="col">Nombre de rouleaux</th>
+            {% elif category == "rawmatter" or category == "coiltype" %}
+            <th scope="col">Poids Total</th>
+            {% endif %}
+            <th scope="col">Quantité</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% if category == "handle" %}
+        {% for order_item in object.handles.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% elif category == "labelling" %}
+        {% for order_item in object.labellings.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% elif category == "package" %}
+        {% for order_item in object.packages.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+          {% elif category == "tape" %}
+        {% for order_item in object.tapes.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+          {% elif category == "part" %}
+        {% for order_item in object.parts.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}  
+          {% else %}
+          {% for order_item in object.items.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item.product_designation }}</td>
+            {% if category == "finishedproducttype" %}
+            <td>{{ order_item.get_roll_quantity }}</td>
+            {% elif category == "rawmatter" or category == "coiltype" %}
+            <td>{{ order_item.get_weight }}</td>
+            {% endif %}
+            <td>{{ order_item.quantity }}</td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+      <div class="text-left">
+        <hr>
+        {% if category == "rawmatter" %}<strong>Nombre Total De Sacs: {{ object.get_total }} </strong>
+        {% elif category == "finishedproducttype" %}<strong>Nombre Total De Colis: {{ object.get_total }} </strong>
+        {% endif %}
+        <br />
+        <strong>Date: {{ object.ordered_date }} </strong>
+    </div>
+  </div>
+</main>
+
+{% endblock content %}

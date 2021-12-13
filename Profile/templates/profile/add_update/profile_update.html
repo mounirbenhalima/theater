@@ -1,0 +1,16 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="container shadow-lg p-3 mb-5 bg-white rounded">
+    <div class="text-center">
+        <h1>Information RH</h1>
+    </div>
+    <form action="" method="POST">{% csrf_token %}
+        {{form.as_p}}
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-outline-dark btn-lg float-right" type="submit">Sauvgarder</button>
+            </div>
+        </div>
+    </form>
+</div>
+{% endblock %}

@@ -1,0 +1,56 @@
+{% extends 'base/base.html' %}
+{% block content %}
+<div class="container shadow-lg p-3 mb-5 bg-white rounded">
+    <div class="text-center">
+        <h1>Ajouter Utilisateur</h1>
+    </div>
+    <form method="POST">{% csrf_token %}
+        <div class="form-row">
+      <div class="col-md-6 mb-3">
+        {{ form.username.label }}
+        {{form.username}}
+      </div>
+      <div class="col-md-6 mb-3">
+        {{ form.email.label }}
+        {{form.email}}
+      </div>
+    </div>
+
+    <div class="form-row">
+      <div class="col-md-6 mb-3">
+        {{ form.first_name.label }}
+        {{form.first_name}}
+      </div>
+      <div class="col-md-6 mb-3">
+        {{ form.last_name.label }}
+        {{form.last_name}}
+      </div>
+    </div>
+    <div class="form-row">
+      <div class="col-md-6 mb-3">
+        {{ form.password1.label }}
+        {{form.password1}}
+      </div>
+      <div class="col-md-6 mb-3">
+        {{ form.password2.label }}
+        {{form.password2}}
+      </div>
+    </div>
+        <div class="row">
+            <div class="col-sm-12">
+                <button class="btn btn-outline-dark btn-lg float-right" type="submit">Continuer</button>
+            </div>
+        </div>
+        <div class="row mt-4">
+            <form class="form-inline">
+                <div class="col-sm-12 col-md-9 form-group">
+                    {% include 'base/form_validators.html' %}
+                    {% include 'base/messages.html' %}
+                </div>
+                <div class="col-sm-12 col-md-3 form-group">
+                </div>
+            </form>
+        </div>
+    </form>
+</div>
+{% endblock content %}

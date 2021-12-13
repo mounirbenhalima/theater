@@ -1,0 +1,499 @@
+{% extends "base/base.html" %} {% load static %} {% block content %}
+
+<script
+  type="text/javascript"
+  src="{% static 'MDB/js/jquery.min.js' %}"
+></script>
+<script type="text/javascript">
+  $(document).ready(function () {
+    $('#validation_button').click(function(e) {
+        //alert('test')
+    e.preventDefault();
+    window.location.replace('{% url "stock-manager:index" %}');
+    window.open('{% url "stock-manager:order-validation" %}');
+
+  });
+    //$("#id_client").hide();
+    $("#id_intern_user").hide();
+    //$('#client_label_id').hide();
+    $('#user_label_id').hide();
+    
+
+    $("#id_type_consumption").change(function () {
+      if ($("#id_type_consumption option:selected").val() == "EXTERNAL") {
+        $("#id_intern_user").hide();
+        $('#user_label_id').hide();
+        $("#id_company").show();
+        $('#company_label_id').show();
+      }
+      if ($("#id_type_consumption option:selected").val() == "INTERNAL")  {
+        $("#id_company").hide();
+        $('#company_label_id').hide();
+        $("#id_intern_user").show();
+        $('#user_label_id').show();
+        
+      }
+    });
+  });
+</script>
+
+<main>
+  <div class="container shadow-lg p-3 mb-5 bg-white rounded">
+    <div class="table-responsive text-nowrap">
+      <h2>Commande N°: <strong>{{ object.slug }}</strong></h2>
+      <br />
+      <div class="container">
+      {% if order_product == "rawmatter" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Matière Première</h2>
+      {% endif %}
+      {% if order_product == "finishedproducttype" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Produits Finis</h2>
+      {% endif %}
+      {% if order_product == "coiltype" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Bobines</h2>
+      {% endif %}
+      {% if order_product == "handle" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Cordon</h2>
+      {% endif %}
+      {% if order_product == "labelling" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Labelling</h2>
+      {% endif %}
+      {% if order_product == "package" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Emballage</h2>
+      {% endif %}
+      {% if order_product == "tape" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Scotch</h2>
+      {% endif %}
+      {% if order_product == "part" %}
+        <h2 style="text-align: center">{{ object.get_type_order_display }} Pièce de Rechange</h2>
+      {% endif %}
+      </div>
+      <br />
+      <div class="float-right">
+        <!--  -->
+        <!--  -->
+        <form method="POST" action=".">
+        {% csrf_token %}
+        {% if  object.user.profile.job_position.name == "Gestionnaire de Stock" %}
+        <!--  -->
+        {% if object.supplier != None %}
+        <!--  -->
+        <label >Client: </label>
+        <strong>{{ object.supplier }}</strong>
+        {% else %}
+        
+          
+          <div class="form-inline">
+            <div class="form-inline">
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "finishedproducttype" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              <input  type="checkbox" name="_internal_stock" id="_internal_stock" ><label for="_internal_stock">Stock Interne</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              <input  type="checkbox" name="_external_stock" id="_external_stock" ><label for="_external_stock">Stock Externe</label>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;
+              {% endif %}
+              <label id="client_label_id" style = "font-weight : bold"> Client :  </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "finishedproducttype" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.client }}
+              {% elif object.client is not None %}
+              {{ object.client }}
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "rawmatter" %}
+              <label style = "font-weight : bold">Type de consommation: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "rawmatter" %}
+              {% if object.type_consumption == None %}
+              {{ form.type_consumption }}
+              {% else %}
+              {{ object.get_type_consumption_display }} &nbsp;
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "rawmatter" %}
+              <label id="company_label_id" style = "font-weight : bold"> Pour: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "rawmatter" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.company }}
+              {% elif object.company is not None %}
+              {{ object.company }}
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "rawmatter"  %}
+              <label id="user_label_id" style = "font-weight : bold"> Opérateur: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "rawmatter"  %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.intern_user }} 
+              {% elif object.intern_user is not None %}
+              {{ object.intern_user }} 
+              {% endif %}
+              {% endif %}
+
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "handle" %}
+              <label style = "font-weight : bold">Type de consommation: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "handle" %}
+              {% if object.type_consumption == None %}
+              {{ form.type_consumption }}
+              {% else %}
+              {{ object.get_type_consumption_display }} &nbsp;
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "handle" %}
+              <label id="company_label_id" style = "font-weight : bold"> Pour: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "handle" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.company }}
+              {% elif object.company is not None %}
+              {{ object.company }}
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "handle"  %}
+              <label id="user_label_id" style = "font-weight : bold"> Opérateur: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "handle"  %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.intern_user }} 
+              {% elif object.intern_user is not None %}
+              {{ object.intern_user }} 
+              {% endif %}
+              {% endif %}
+
+
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "labelling" %}
+              <label style = "font-weight : bold">Type de consommation: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "labelling" %}
+              {% if object.type_consumption == None %}
+              {{ form.type_consumption }}
+              {% else %}
+              {{ object.get_type_consumption_display }} &nbsp;
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "labelling" %}
+              <label id="company_label_id" style = "font-weight : bold"> Pour: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "labelling" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.company }}
+              {% elif object.company is not None %}
+              {{ object.company }}
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "labelling"  %}
+              <label id="user_label_id" style = "font-weight : bold"> Opérateur: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "labelling"  %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.intern_user }} 
+              {% elif object.intern_user is not None %}
+              {{ object.intern_user }} 
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "package" %}
+              <label style = "font-weight : bold">Type de consommation: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "package" %}
+              {% if object.type_consumption == None %}
+              {{ form.type_consumption }}
+              {% else %}
+              {{ object.get_type_consumption_display }} &nbsp;
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "package" %}
+              <label id="company_label_id" style = "font-weight : bold"> Pour: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "package" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.company }}
+              {% elif object.company is not None %}
+              {{ object.company }}
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "package"  %}
+              <label id="user_label_id" style = "font-weight : bold"> Opérateur: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "package"  %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.intern_user }} 
+              {% elif object.intern_user is not None %}
+              {{ object.intern_user }} 
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "tape" %}
+              <label style = "font-weight : bold">Type de consommation: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "tape" %}
+              {% if object.type_consumption == None %}
+              {{ form.type_consumption }}
+              {% else %}
+              {{ object.get_type_consumption_display }} &nbsp;
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "tape" %}
+              <label id="company_label_id" style = "font-weight : bold"> Pour: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "tape" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.company }}
+              {% elif object.company is not None %}
+              {{ object.company }}
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "tape"  %}
+              <label id="user_label_id" style = "font-weight : bold"> Opérateur: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "tape"  %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.intern_user }} 
+              {% elif object.intern_user is not None %}
+              {{ object.intern_user }} 
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "part" %}
+              <label style = "font-weight : bold">Type de consommation: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "part" %}
+              {% if object.type_consumption == None %}
+              {{ form.type_consumption }}
+              {% else %}
+              {{ object.get_type_consumption_display }} &nbsp;
+              {% endif %}
+              {% endif %}
+
+              {% if object.type_order == 'STOCK_OUT' and order_product == "part" %}
+              <label id="company_label_id" style = "font-weight : bold"> Pour: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "part" %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.company }}
+              {% elif object.company is not None %}
+              {{ object.company }}
+              {% endif %}
+              {% endif %}
+              
+              {% if object.type_order == 'STOCK_OUT' and order_product == "part"  %}
+              <label id="user_label_id" style = "font-weight : bold"> Opérateur: </label> {% endif %}
+              {% if object.type_order == 'STOCK_OUT' and order_product == "part"  %}
+              {% if object.client is None and object.supplier is None and object.intern_user is None and object.company is None %}
+              {{ form.intern_user }} 
+              {% elif object.intern_user is not None %}
+              {{ object.intern_user }} 
+              {% endif %}
+              {% endif %}
+
+
+            </div>
+            {% if object.type_order == "STOCK_ENTRY" and order_product == "rawmatter" %}
+            <label style = "font-weight : bold"> Fournisseur: </label>
+            {{ form.supplier }} {% endif %}
+            {% if object.type_order == "STOCK_RETURN" and order_product == "finishedproducttype" %}
+            <label style = "font-weight : bold"> Client: </label>
+            {% if object.client is None %}
+            {{ form.client }} {% else %} {{ object.client }} {% endif %} {% endif %}
+            {% if object.type_order == "STOCK_ENTRY" and order_product == "handle" %}
+            <label style = "font-weight : bold"> Fournisseur: </label>
+            {{ form.supplier }} {% endif %}
+            {% if object.type_order == "STOCK_ENTRY" and order_product == "labelling" %}
+            <label style = "font-weight : bold"> Fournisseur: </label>
+            {{ form.supplier }} {% endif %}
+            {% if object.type_order == "STOCK_ENTRY" and order_product == "package" %}
+            <label style = "font-weight : bold"> Fournisseur: </label>
+            {{ form.supplier }} {% endif %}
+            {% if object.type_order == "STOCK_ENTRY" and order_product == "tape" %}
+            <label style = "font-weight : bold"> Fournisseur: </label>
+            {{ form.supplier }} {% endif %}
+            {% if object.type_order == "STOCK_ENTRY" and order_product == "part" %}
+            <label style = "font-weight : bold"> Fournisseur: </label>
+            {{ form.supplier }} {% endif %}
+            {% if object.client is None and object.supplier is None and object.company is None and object.intern_user is None %}
+            <button type="submit" class="btn btn-sm btn-dark">Choisir</button>
+            {% endif %}
+          </div>
+
+          {% endif %}
+
+        {% elif object.user.profile.job_position.name == "Mélangeur" %}
+        <div class="form-inline">
+          <label style = "font-weight : bold"> Mélangeur: </label>
+
+          {% if object.machine is None %}
+          {{ form.machine }} 
+          <button type="submit" class="btn btn-sm btn-dark">Choisir</button>
+          {% else %}
+          {{ object.machine }}
+          {% endif %}
+
+        
+        {% endif %}
+        </div>
+        </form>
+        <!--  -->
+        
+        <!--  -->
+      </div>
+      <table class="table">
+        <thead>
+          <tr>
+            <th scope="col">#</th>
+            <th scope="col">Nom</th>
+            <th scope="col">Quantité</th>
+            <th scope="col">Action</th>
+          </tr>
+        </thead>
+        <tbody>
+        {% if order_product == "handle" %}
+          {% for order_item in object.handles.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>
+              <a
+                class="btn btn-red btn-sm"
+                href="{% url 'stock-manager:remove-item' order_item.identifier %}">Supprimer
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"><h2>Vous n'avez aucun produit</h2></td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% elif order_product == "labelling" %}
+          {% for order_item in object.labellings.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>
+              <a
+                class="btn btn-red btn-sm"
+                href="{% url 'stock-manager:remove-item' order_item.identifier %}"
+                >Supprimer
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"><h2>Vous n'avez aucun produit</h2></td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% elif order_product == "package" %}
+          {% for order_item in object.packages.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>
+              <a
+                class="btn btn-red btn-sm"
+                href="{% url 'stock-manager:remove-item' order_item.identifier %}"
+                >Supprimer
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"><h2>Vous n'avez aucun produit</h2></td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% elif order_product == "tape" %}
+          {% for order_item in object.tapes.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>
+              <a
+                class="btn btn-red btn-sm"
+                href="{% url 'stock-manager:remove-item' order_item.identifier %}"
+                >Supprimer
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"><h2>Vous n'avez aucun produit</h2></td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% elif order_product == "part" %}
+          {% for order_item in object.parts.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>
+              <a
+                class="btn btn-red btn-sm"
+                href="{% url 'stock-manager:remove-item' order_item.identifier %}"
+                >Supprimer
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"><h2>Vous n'avez aucun produit</h2></td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+        {% else %}
+          {% for order_item in object.items.all %}
+          <tr>
+            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{ order_item.item.product_designation }}</td>
+            <td>{{ order_item.quantity }}</td>
+            <td>
+              <a
+                class="btn btn-red btn-sm"
+                href="{% url 'stock-manager:remove-item' order_item.identifier %}"
+                >Supprimer
+              </a>
+            </td>
+          </tr>
+          {% empty %}
+          <tr>
+            <td colspan="5"><h2>Vous n'avez aucun produit</h2></td>
+          </tr>
+          <tr>
+            <td colspan="5"></td>
+          </tr>
+          {% endfor %}
+          {% endif %}
+        </tbody>
+      </table>
+      <div class="text-left">
+        <hr />
+        <strong>Quantité Totale: {{ object.get_total }} </strong>
+        <br />
+        <strong>Date: {{ object.ordered_date }} </strong>
+      </div>
+      <div class="mt-3">{% include 'base/messages.html' %}</div>
+      <!--  -->
+      {% if object.supplier != None or object.client != None or object.intern_user != None or object.company != None %}
+      <a id = "validation_button" class="btn btn-dark float-right mt-4" type="submit" href="#">Valider</a>
+      {% endif %}
+      {% if  object.user.profile.job_position.name == "Mélangeur" %}
+      {% if object.machine is not None %}
+      <a class="btn btn-outline-dark float-right" type="submit" href="{% url 'stock-manager:order-validation' %}">Valider</a>
+      {% endif %}
+      {% endif %}
+    </div>
+  </div>
+</main>
+{% endblock content %}

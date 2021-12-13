@@ -1,0 +1,70 @@
+<!DOCTYPE html>
+<script>
+window.location.hash="no-back-button";
+window.location.hash="Again-No-back-button";//again because google chrome don't insert first hash into history
+window.onhashchange=function(){window.location.hash="no-back-button";}
+</script> 
+{% load static %}
+<html lang="en">
+  <head>
+    <!-- Required meta tags -->
+    <meta charset="utf-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, shrink-to-fit=no"
+    />
+    <!-- FavIcon -->
+    <link rel="icon" href="{% static 'favicon.ico' %}" />
+    <!-- Bootstrap core CSS -->
+    <link href="{% static 'MDB/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <!-- Material Design Bootstrap -->
+    <link href="{% static 'MDB/css/mdb.min.css' %}" rel="stylesheet" />
+    <!-- Your custom styles (optional) -->
+    <link href="{% static 'MDB/css/style.css' %}" rel="stylesheet" />
+    <!-- FontAwsome Fonts -->
+    <link
+      href="{% static '/fontawesome/css/fontawesome.css' %}"
+      rel="stylesheet"
+    />
+    <link href="{% static '/fontawesome/css/brands.css' %}" rel="stylesheet" />
+    <link href="{% static '/fontawesome/css/solid.css' %}" rel="stylesheet" />
+    <!-- Custom CSS -->
+    <link
+      href="{% static '/default/tay_plast/css/styles.css' %}"
+      rel="stylesheet"
+    />
+    <title>TAY PLAST - ERP |{% block title %}{% endblock %}</title>
+  </head>
+
+  <body>
+    {% include "base/_struct/navbar.html" %}
+    <!--  -->
+    {% block content %}
+    <!--  -->
+    {% endblock content %}
+    <!--  -->
+    {% include 'base/paginator.html' %}
+    <!--  -->
+    <!-- jQuery first, then Popper.js, then Bootstrap JS -->
+    <!-- JQuery -->
+    <script
+      type="text/javascript"
+      src="{% static 'MDB/js/jquery.min.js' %}"
+    ></script>
+    <!-- Bootstrap tooltips -->
+    <script
+      type="text/javascript"
+      src="{% static 'MDB/js/popper.min.js' %}"
+    ></script>
+    <!-- Bootstrap core JavaScript -->
+    <script
+      type="text/javascript"
+      src="{% static 'MDB/js/bootstrap.min.js' %}"
+    ></script>
+    <!-- MDB core JavaScript -->
+    <script
+      type="text/javascript"
+      src="{% static 'MDB/js/mdb.min.js' %}  "
+    ></script>
+  </body>
+</html>
