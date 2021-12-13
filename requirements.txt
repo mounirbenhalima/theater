@@ -1,0 +1,10 @@
+dj-database-url==0.4.2
+Django==3.2.10
+gunicorn==19.7.1
+psycopg2==2.7.3.2
+pytz==2017.3
+whitenoise==5.3.0
+xhtml2pdf
+qrcode
+pillow
+reportlab

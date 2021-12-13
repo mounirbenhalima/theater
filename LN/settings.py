@@ -1,6 +1,7 @@
 import os
 from pathlib import Path
 from django.contrib.messages import constants as message_constants
+import dj_database_url 
 
 MESSAGE_TAGS = {
     message_constants.DEBUG: 'debug',
@@ -29,13 +30,14 @@ SECRET_KEY = 'cgyv6_%c*w-bfx%zjy2ir1w5e3j!oz3yxgo1b68!itg@#b33%i'
 DEBUG = True
 
 ALLOWED_HOSTS = [
-    "*"
+    '*',
 ]
 
 
 # Application definition
 
 INSTALLED_APPS = [
+    'whitenoise.runserver_nostatic',
     'django.contrib.admin',
     'django.contrib.auth',
     'django.contrib.contenttypes',
@@ -52,6 +54,7 @@ INSTALLED_APPS = [
 ]
 
 MIDDLEWARE = [
+    'whitenoise.middleware.WhiteNoiseMiddleware',
     'django.middleware.security.SecurityMiddleware',
     'django.contrib.sessions.middleware.SessionMiddleware',
     'django.middleware.common.CommonMiddleware',
@@ -61,7 +64,7 @@ MIDDLEWARE = [
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
 ]
 
-ROOT_URLCONF = 'PRJ.urls'
+ROOT_URLCONF = 'LN.urls'
 
 TEMPLATES = [
     {
@@ -79,7 +82,7 @@ TEMPLATES = [
     },
 ]
 
-WSGI_APPLICATION = 'PRJ.wsgi.application'
+WSGI_APPLICATION = 'LN.wsgi.application'
 
 
 # Database
@@ -87,11 +90,17 @@ WSGI_APPLICATION = 'PRJ.wsgi.application'
 
 DATABASES = {
     'default': {
-        'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': 'db.sqlite3',
+        'ENGINE': 'django.db.backends.postgresql_psycopg2',
+        'NAME': 'lnplast',
+        'USER': 'postgres',
+        'PASSWORD': 'Wendy123()=',
+        'HOST': 'localhost',
+        'PORT': '',
     }
 }
 
+prod_db  =  dj_database_url.config(conn_max_age=500)
+DATABASES['default'].update(prod_db)
 
 # Password validation
 # https://docs.djangoproject.com/en/3.1/ref/settings/#auth-password-validators
@@ -141,12 +150,20 @@ LOGOUT_REDIRECT_URL = 'login'
 SESSION_COOKIE_AGE = 3600 * 60
 
 # Mail Configuration
-EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_USE_TLS = True
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_HOST_USER = 'tayplast.dz@gmail.com'
-EMAIL_HOST_PASSWORD = 'Tayplast2020'
 
 # Import Export Conf
 IMPORT_EXPORT_USE_TRANSACTIONS = True
+
+# Static files (CSS, JavaScript, Images)
+# https://docs.djangoproject.com/en/1.11/howto/static-files/
+PROJECT_ROOT = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
+STATIC_ROOT  =   os.path.join(PROJECT_ROOT, 'staticfiles')
+STATIC_URL = '/static/'
+
+# Extra lookup directories for collectstatic to find static files
+STATICFILES_DIRS = (
+    os.path.join(PROJECT_ROOT, 'static'),
+)
+
+#  Add configuration for static files storage using whitenoise
+STATICFILES_STORAGE = 'whitenoise.storage.CompressedManifestStaticFilesStorage'

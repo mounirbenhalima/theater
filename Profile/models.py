@@ -6,7 +6,10 @@ from django.db.models import Q
 
 
 def get_user_name(self):
-    return f'{self.profile.job_position.name}: {self.first_name} {self.last_name}'
+    get_job_position = self.profile.job_position.name if self.profile.job_position is not None else ""
+    get_first_name = self.first_name if self.first_name is not None else "Anonyme"
+    get_last_name = self.last_name if self.last_name is not None else "Anonyme"
+    return f'{get_job_position}: {get_first_name} {get_last_name}'
 
 User.add_to_class("__str__", get_user_name)
 
