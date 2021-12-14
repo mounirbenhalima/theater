@@ -1,3 +1,5 @@
+import os, glob, shutil, sys
+
 import qrcode
 from PIL import Image
 
@@ -2577,7 +2579,7 @@ class ExtrusionCreateView(View):
                 user = self.request.user
 
                 extrusion = Production(date=timezone.now(),coil_type = product, user=request.user, quantity_produced=1, machine=machine, process_type="EXTRUSION", state="PENDING")
-                ref = get_random_string(10)
+                ref = get_random_string(15)
                 
                 coil = Coil(user=user, type_coil = product , extrusion_machine = extrusion.machine, ref=ref, creation_date=timezone.now(), name=product.name, quantity=1, type_name=product.type_name, capacity=product.capacity,
                                 perfume=product.perfume, the_print=product.the_print, brand=product.brand, color=product.color, warehouse=product.warehouse, printed="NOT_PRINTED")
@@ -2678,6 +2680,17 @@ def print_ticket(request, slug):
     coil = get_object_or_404(Coil, slug=slug)
     coil.ticket_printed = True
     coil.save()
+
+    try:
+        shutil.rmtree("c:\\qrs")
+    except:
+        pass
+
+    directory = "qrs"
+    parent_dir = "c:\\"
+    mode = 0o666
+    path = os.path.join(parent_dir, directory)
+    os.mkdir(path, mode)
     qr = qrcode.QRCode(
     version=1,
     error_correction=qrcode.constants.ERROR_CORRECT_H,
@@ -2687,57 +2700,35 @@ def print_ticket(request, slug):
     qr.add_data(coil.ref)
     qr.make(fit=True)
     img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
-    filename = "/home/mounir/Desktop/"+coil.ref+".jpeg"
-    img.save(filename)
-    template = loader.get_template('production/coil_ticket.html')
-    try:
-        company = Company.objects.filter(name='Tayplast')[0]
-    except:
-        company = 'Tayplast'
-    context = {
-        "user": request.user,
-        "company": company,
-        "coil": coil,
-
-    }
-    html = template.render(context)
-    pdf = render_to_pdf('production/coil_ticket.html', context)
-    if pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "%s.pdf" % (coil.product_designation)
-        content = "inline; filename='%s'" % (filename)
-        download = request.GET.get("download")
-        if download:
-            content = "attachment; filename='%s'" % (filename)
-        response['Content-Disposition'] = content
-        return response
-    return HttpResponse("Not found")
+    filename = coil.ref+".jpeg"
+    img.save("c:\\qrs\\"+filename)
+    return render(request, 'production/extrusion_coil_list.html', context={'object_list': Coil.objects.filter(status="PENDING_EXTRUSION") | Coil.objects.filter(user=request.user, ticket_printed = False) | Coil.objects.filter(introducer=request.user, ticket_printed = False)})
 
 def print_issue_ticket(request, slug):
     coil = get_object_or_404(Coil, slug=slug)
     template = loader.get_template('production/coil_issue_ticket.html')
-    try:
-        company = Company.objects.filter(name='Tayplast')[0]
-    except:
-        company = 'Tayplast'
-    context = {
-        "user": request.user,
-        "company": company,
-        "coil": coil,
 
-    }
-    html = template.render(context)
-    pdf = render_to_pdf('production/coil_issue_ticket.html', context)
-    if pdf:
-        response = HttpResponse(pdf, content_type='application/pdf')
-        filename = "{coil.get_status_display}-{coil.product_designation}%s.pdf" % ("12341231")
-        content = "inline; filename='%s'" % (filename)
-        download = request.GET.get("download")
-        if download:
-            content = "attachment; filename='%s'" % (filename)
-        response['Content-Disposition'] = content
-        return response
-    return HttpResponse("Not found")
+    try:
+        shutil.rmtree("c:\\qrs")
+    except:
+        pass
+
+    directory = "qrs"
+    parent_dir = "c:\\"
+    mode = 0o666
+    path = os.path.join(parent_dir, directory)
+    os.mkdir(path, mode)
+    qr = qrcode.QRCode(
+    version=1,
+    error_correction=qrcode.constants.ERROR_CORRECT_H,
+    box_size=10,
+    border=4,
+    )
+    qr.add_data(coil.ref)
+    qr.make(fit=True)
+    img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
+    filename = coil.ref+".jpeg"
+    img.save("c:\\qrs\\"+filename)
 
 def shaping_coil_list(request):
     cw = None
@@ -2790,8 +2781,8 @@ def shaping_coil_list(request):
                 mchn.save()
                 coil.status = "CUT"
                 coil.save()
-                ref_consumed = get_random_string(10)
-                ref_quarantine = get_random_string(10)
+                ref_consumed = get_random_string(15)
+                ref_quarantine = get_random_string(15)
                 weight_consumed = coil.weight - qw
                 consumed_coil = Coil(user=coil.user, introducer = coil.introducer,type_name = coil.type_name,  type_coil = coil.type_coil, micronnage = coil.micronnage,supplier = coil.supplier, extrusion_machine = coil.extrusion_machine, printing_machine = coil.printing_machine, shaping_machine = coil.shaping_machine, creation_date = coil.creation_date, printing_date = coil.printing_date, shaping_date= coil.shaping_date, printer=coil.printer, shaper = coil.shaper, ref=ref_consumed, parent=coil, name=coil.name, capacity=coil.capacity, printed = coil.printed, 
                                      is_sub = True,color=coil.color, the_print=coil.the_print, perfume=coil.perfume, status="CONSUMED", weight=weight_consumed, cw1 = coil.cw1, cw2 = coil.cw2, cw3 = coil.cw3, cwm = coil.cwm, ticket_printed = True)
@@ -3065,7 +3056,7 @@ class TrashCreateView(View):
                 weight = form.weight
                 user = request.user
                 company = Company.objects.get(name="Tayplast")
-                ref = get_random_string(8)
+                ref = get_random_string(15)
                 trash = Trash(ref=ref, date=timezone.now(), user=user, weight=weight, machine=machine, trash_type=trash_type, whereabouts=company, state="PENDING")
                 trash.save()
                 return redirect(self.success_url)
@@ -3522,8 +3513,8 @@ def printing_coil_list(request):
             production = Production.objects.get(process_type="PRINTING", coil=coil, state="PENDING")
             production.state = "FINISHED"
             coil.status = "CUT"
-            sub_ref1 = get_random_string(10)
-            sub_ref2 = get_random_string(10)
+            sub_ref1 = get_random_string(15)
+            sub_ref2 = get_random_string(15)
             rest_weight = coil.weight - weight 
             sub_coil1 = Coil(user=coil.user,introducer=coil.introducer,weight = weight ,type_coil = coil.type_coil, extrusion_machine = coil.extrusion_machine, printing_machine= coil.printing_machine, printer= coil.printer , printing_date = coil.printing_date , ref=sub_ref1, parent=coil, is_sub=True, creation_date=timezone.now(), name=coil.name, quantity=1, type_name=coil.type_name,
                              capacity=coil.capacity, micronnage = coil.micronnage, perfume=coil.perfume, the_print=coil.the_print, brand=coil.brand, color=coil.color, warehouse=coil.warehouse, status="IN_STOCK", printed="PRINTED")

@@ -504,7 +504,7 @@ class CoilEntryView(View):
                 product = form.type_coil
                 source = form.supplier
                 user = request.user
-                ref = get_random_string(10)
+                ref = get_random_string(15)
                 coil = Coil(introducer = user, type_coil = product, ref =ref, creation_date = timezone.now() , name = product.name, quantity = 1, status ="PENDING_DATA" , type_name = product.type_name, capacity = product.capacity, perfume = product.perfume, link = product.link, brand = product.brand, color = product.color, supplier = source, warehouse = product.warehouse)
                 coil.save()
                 return redirect (self.success_url)
@@ -1748,7 +1748,7 @@ class GeneralTrashCreateView(View):
                 weight = form.weight
                 comment = form.comment
                 company = Company.objects.get(name = "Tayplast")
-                ref = get_random_string(8)
+                ref = get_random_string(15)
                 trash = Trash(ref = ref, date = timezone.now(), weight = weight, machine = machine, trash_type = trash_type, whereabouts = company, state = "VALIDATED", comment = comment )
                 trash.save()
                 return redirect (self.success_url)
@@ -1826,7 +1826,7 @@ class TrashOutView(View):
                 elif trash_type == "BASSE_DENSITE" and weight > total_trash_low:
                     messages.error(request, "Poids Déchet non disponible en stock !")
                     return redirect(self.request.META.get('HTTP_REFERER'))
-                ref = get_random_string(8)
+                ref = get_random_string(15)
                 trashout = TrashOut(ref = ref, user = request.user, date = timezone.now(), weight = weight, trash_type = trash_type, destination = destination )
                 trashout.save()
                 
