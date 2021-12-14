@@ -2702,7 +2702,29 @@ def print_ticket(request, slug):
     img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
     filename = coil.ref+".jpeg"
     img.save("c:\\qrs\\"+filename)
-    return render(request, 'production/extrusion_coil_list.html', context={'object_list': Coil.objects.filter(status="PENDING_EXTRUSION") | Coil.objects.filter(user=request.user, ticket_printed = False) | Coil.objects.filter(introducer=request.user, ticket_printed = False)})
+    template = loader.get_template('production/coil_ticket.html')
+    try:
+        company = Company.objects.filter(name='Tayplast')[0]
+    except:
+        company = 'Tayplast'
+    context = {
+        "user": request.user,
+        "company": company,
+        "coil": coil,
+
+    }
+    html = template.render(context)
+    pdf = render_to_pdf('production/coil_ticket.html', context)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "%s.pdf" % (coil.product_designation)
+        content = "inline; filename='%s'" % (filename)
+        download = request.GET.get("download")
+        if download:
+            content = "attachment; filename='%s'" % (filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
 
 def print_issue_ticket(request, slug):
     coil = get_object_or_404(Coil, slug=slug)
@@ -2729,6 +2751,29 @@ def print_issue_ticket(request, slug):
     img = qr.make_image(fill_color="black", back_color="white").convert('RGB')
     filename = coil.ref+".jpeg"
     img.save("c:\\qrs\\"+filename)
+    template = loader.get_template('production/coil_ticket.html')
+    try:
+        company = Company.objects.filter(name='Tayplast')[0]
+    except:
+        company = 'Tayplast'
+    context = {
+        "user": request.user,
+        "company": company,
+        "coil": coil,
+
+    }
+    html = template.render(context)
+    pdf = render_to_pdf('production/coil_ticket.html', context)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "%s.pdf" % (coil.product_designation)
+        content = "inline; filename='%s'" % (filename)
+        download = request.GET.get("download")
+        if download:
+            content = "attachment; filename='%s'" % (filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
 
 def shaping_coil_list(request):
     cw = None

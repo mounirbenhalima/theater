@@ -99,9 +99,9 @@
             {% endif %}
             {% else %}
             {% if coil.ticket_printed is True %}
-            <a type="submit" class="btn btn- btn-sm float-left" href ="{% url 'production:print-ticket' coil.slug %}">Imp. Etq (déjà imprimée)</a>
+            <a type="submit" class="btn btn- btn-sm float-left" href ="{% url 'production:print-ticket' coil.slug %}" target="_blank">Imp. Etq (déjà imprimée)</a>
             {% elif coil.ticket_printed is False %}
-              <a type="submit" class="btn btn- btn-sm float-left" href ="{% url 'production:print-ticket' coil.slug %}">Imp. Etq</a>
+              <a type="submit" class="btn btn- btn-sm float-left" href ="{% url 'production:print-ticket' coil.slug %}" target="_blank">Imp. Etq</a>
             {% endif %}
             {% endif %}
             </td>
