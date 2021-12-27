@@ -1,6 +1,5 @@
 import os, glob, shutil, sys
 
-import qrcode
 from PIL import Image
 
 from django.contrib.auth.decorators import login_required
