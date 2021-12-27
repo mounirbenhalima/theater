@@ -15,39 +15,36 @@
     </style>
   </head>
   <body>
-    <div style="margin: auto;">
-      <img id='barcode' src="https://api.qrserver.com/v1/create-qr-code/?data={{coil.ref}}" alt="" title="{{coil.ref}}" width="150" height="150"/>
-    </div>
       <div class="card">
         <div>
             {% if coil.status == "QUARANTINE" %}
             <p style="text-align: center; font-size: 25px; margin-bottom : 0px; font-weight : bold;"> BOBINE EN QUARANTAINE </p></br>
             
             <p style="text-align: center; font-size: 20px;">  
-            ({{ coil.motive }})</br>
+            ({{ coil.motive }})
             </p>
             
             {% elif coil.status == "TO_BE_DESTROYED" %}
             <p style="text-align: center; font-size: 25px; margin-bottom : 0px; font-weight : bold;"> BOBINE A DETRUIRE </p></br>
             
             <p style="text-align: center; font-size: 20px; margin-top : 0px;">
-            ({{ coil.motive|upper }})</br>
+            ({{ coil.motive|upper }})
             </p>
             {% endif %}
           <p style="text-align: center; font-size: 20px; font-weight : bold;">
             {% if coil.status == "TO_BE_DESTROYED" %}
             {% if coil.motive == "Impression" %}
-             {{ coil.printer.first_name|upper }} {{ coil.printer.last_name|upper }}</br> 
+             {{ coil.printer.first_name|upper }} {{ coil.printer.last_name|upper }}
             {% else %}
-             {{ coil.user.first_name|upper }} {{ coil.user.last_name|upper }}</br>
+             {{ coil.user.first_name|upper }} {{ coil.user.last_name|upper }}
             {% endif %} 
             {% endif %}
           </p>
           <p style="text-align: center; margin-bottom : 0px; font-size: 20px; font-weight: bold">
-            {{ coil.ref|upper }} </br></br>
+            {{ coil.ref|upper }} </br>
           </p>
           <p style="text-align: center; margin-bottom : 0px; font-size: 20px;">
-            {{ coil.type_coil|upper }} </br></br>
+            {{ coil.type_coil|upper }} </br>
             {{ coil.weight }} Kg </br>
           </p>
         </div>

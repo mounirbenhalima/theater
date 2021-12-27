@@ -62,7 +62,8 @@
               <button type="submit" class="btn btn-dark btn-sm float-left" >Valider</button>
             {% else %}
             {% if coil.status == "QUARANTINE" or coil.status == "TO_BE_DESTROYED" %}
-              <a type="submit" class="btn btn btn-sm float-left" href="{% url 'production:print-issue-ticket' coil.slug %}" target="_blank">Imp. Etq</a>
+              <a type="submit" class="btn btn btn-sm" href="{% url 'production:print-issue-ticket' coil.slug %}" target="_blank"><i class="fas fa-qrcode fa-lg"></i></a>
+              <a type="submit" class="btn btn btn-sm" href="{% url 'production:print-issue-ticket-no-qr' coil.slug %}" target="_blank">Imp. Etq</a>
             {% endif %}
             {% endif %}
               </td>

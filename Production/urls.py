@@ -12,6 +12,8 @@ from .views import (
     ProductionListView,
     print_ticket,
     print_issue_ticket,
+    print_ticket_no_qr,
+    print_issue_ticket_no_qr,
     validate_production,
     ExtrusionIndexView,
     PrintingIndexView,
@@ -150,6 +152,8 @@ urlpatterns = [
     path('production-list/', ProductionListView.as_view(), name='production-list'),
     path('print-ticket/<slug>/', print_ticket, name='print-ticket'),
     path('print-issue-ticket/<slug>/', print_issue_ticket, name='print-issue-ticket'),
+    path('print-ticket-no-qr/<slug>/', print_ticket_no_qr, name='print-ticket-no-qr'),
+    path('print-issue-ticket-no-qr/<slug>/', print_issue_ticket_no_qr, name='print-issue-ticket-no-qr'),
 
     path('shaping/handle-consumption/', HandleConsumptionView.as_view(), name='handle-consumption'),
     path('shaping/handle-consumption-list/', HandleConsumptionListView.as_view(), name='handle-consumption-list'),

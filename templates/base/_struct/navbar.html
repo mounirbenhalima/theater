@@ -28,6 +28,11 @@
         <a class="nav-link" href="{% url 'production:index-extrusion' %}"><i class="fas fa-atom"></i> Production</a>
       </li>
       {% endif %}
+      {% if request.user.profile.job_position.name == "Opérateur Impression" %}
+      <li class="nav-item">
+        <a class="nav-link" href="{% url 'production:index-printing' %}"><i class="fas fa-atom"></i> Production</a>
+      </li>
+      {% endif %}
       {% if request.user.profile.job_position.name == "Opérateur Façonnage"%}
       <li class="nav-item">
         <a class="nav-link" href="{% url 'production:index-shaping' %}"><i class="fas fa-atom"></i> Production</a>
