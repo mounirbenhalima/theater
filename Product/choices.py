@@ -25,6 +25,7 @@ PRINT_CHOICES = (
 )
 
 SIZE = (
+    (None,"---------"),
     ("SMALL","Petit Modèle"),
     ("MEDIUM","Moyen Modèle"),
     ("BIG","Grand Modèle"),
