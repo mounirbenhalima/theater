@@ -186,13 +186,13 @@ class RawMatterForm(forms.ModelForm):
                 "class": "form-control",
             }
         ))
-    combined_range = forms.ModelChoiceField(
-        queryset=CombinedRange.objects.all(),
-        widget=forms.Select(
-            attrs={
-                "class": "form-control",
-            }
-        ))
+    #combined_range = forms.ModelChoiceField(
+    #    queryset=CombinedRange.objects.all(),
+    #    widget=forms.Select(
+    #        attrs={
+    #            "class": "form-control",
+    #        }
+    #    ))
     flavor = forms.ModelChoiceField(
         label="Parfum",
         required=False,
