@@ -21,6 +21,7 @@ PRINT_CHOICES = (
     ("PHARMACIE", "Pharmacie"),
     ("PIZZA", "Pizza"),
     ("BOUCHERIE", "Boucherie"),
+    ("CUSTOM", "Personnalisé"),
     (None, "--------"),
 )
 

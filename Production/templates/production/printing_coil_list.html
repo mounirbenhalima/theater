@@ -12,8 +12,9 @@
         <tr>
           <th style="width:5%">#</th>
           <th style="width:10%">Référence</th>
-          <th style="width:40%">Produit</th>
-          <th style="width:20%">Poids</th>
+          <th style="width:35%">Produit</th>
+          <th style="width:10%">Poids</th>
+          <th style="width:15%">Machine</th>
           <th style="width:15%" class="float text-center">Action</th>
           <th style="width:10%">Poids</th>
         </tr>
@@ -25,6 +26,7 @@
             <td>{{coil.ref}}</td>
             <td>{{coil.type_coil|upper}}</td>
             <td>{{coil.weight}}</td>
+            <td>{{coil.printing_machine.designation}}</td>
             <form method="POST">
               {% csrf_token %}
             <input type="hidden" value="{{ coil.slug }}" name="get_coil" />
@@ -33,7 +35,8 @@
             {% if coil.ticket_printed is True %}
             <a type="submit" class="btn btn- btn-sm float-left" href ="{% url 'production:print-ticket' coil.slug %}" target="_blank">Imp. Etq (Déjà Imprimée)</a>
             {% elif coil.ticket_printed is False %}
-            <a type="submit" class="btn btn- btn-sm float-left" href ="{% url 'production:print-ticket' coil.slug %}" target="_blank">Imp. Etq</a>
+              <a type="submit" class="btn btn-sm" href ="{% url 'production:print-ticket' coil.slug %}" target="_blank"><i class="fas fa-qrcode fa-lg"></i></a>
+              <a type="submit" class="btn btn-sm" href ="{% url 'production:print-ticket-no-qr' coil.slug %}" target="_blank">Imp. Etq</a>
             {% endif %}
             {% elif coil.status == "PENDING_PRINTING" %}
               <button type="submit" class="btn btn-dark btn-sm float-left mt-0" >Terminer</button>

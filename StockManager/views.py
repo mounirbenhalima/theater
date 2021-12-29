@@ -1561,9 +1561,9 @@ def stock_movement(request, slug):
     order = get_object_or_404(Order, slug=slug)
     template = loader.get_template('invoices/invoice.html')
     try:
-        company = Company.objects.filter(name='Tayplast')[0]
+        company = Company.objects.filter(name='Ln Plast')[0]
     except:
-        company = 'Tayplast'
+        company = 'Ln Plast'
     context = {
         "user": request.user,
         "company": company,
@@ -1607,9 +1607,9 @@ def stock_status(request, category):
     elif product_type == 'part':
         product_list = SparePart.objects.all()  
     try:
-        company = Company.objects.filter(name='Tayplast')[0]
+        company = Company.objects.filter(name='Ln Plast')[0]
     except:
-        company = 'Tayplast'
+        company = 'Ln Plast'
     template = loader.get_template('invoices/stock_status.html')
     context = {
         "user": request.user,
@@ -1646,9 +1646,9 @@ def stock_workshop_status(request, category):
     elif product_type == 'package':
         product_list = Package.objects.all()
     try:
-        company = Company.objects.filter(name='Tayplast')[0]
+        company = Company.objects.filter(name='Ln Plast')[0]
     except:
-        company = 'Tayplast'
+        company = 'Ln Plast'
     template = loader.get_template('invoices/workshop_stock_status.html')
     context = {
         "user": request.user,
@@ -1702,9 +1702,9 @@ def trashout_invoice(request, ref):
     trashout = get_object_or_404(TrashOut, ref=ref)
     template = loader.get_template('invoices/trashout_invoice.html')
     try:
-        company = Company.objects.filter(name='Tayplast')[0]
+        company = Company.objects.filter(name='Ln Plast')[0]
     except:
-        company = 'Tayplast'
+        company = 'Ln Plast'
     context = {
         "user": request.user,
         "company": company,
@@ -1747,7 +1747,7 @@ class GeneralTrashCreateView(View):
                 machine = form.machine
                 weight = form.weight
                 comment = form.comment
-                company = Company.objects.get(name = "Tayplast")
+                company = Company.objects.get(name = "Ln Plast")
                 ref = get_random_string(15)
                 trash = Trash(ref = ref, date = timezone.now(), weight = weight, machine = machine, trash_type = trash_type, whereabouts = company, state = "VALIDATED", comment = comment )
                 trash.save()
@@ -2063,7 +2063,7 @@ def recap(request):
         start_date = start_date.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
         end_date = end_date.replace(hour = 23, minute = 59, second = 59, microsecond = 0)
 
-        company = Company.objects.filter(name ="Tayplast")[0]
+        company = Company.objects.filter(name ="Ln Plast")[0]
         ####################### Pointage #######################
     
         product_orders = Order.objects.filter(category = "Produit Fini") 

@@ -1397,7 +1397,7 @@ def reporting(request):
         start_date = start_date.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
         end_date = end_date.replace(hour = 23, minute = 59, second = 59, microsecond = 0)
 
-        company = Company.objects.filter(name ="Tayplast")[0]
+        company = Company.objects.filter(name ="Ln Plast")[0]
         ####################### Pointage #######################
 
         products = FinishedProductType.objects.all()
@@ -1894,7 +1894,7 @@ def points(request):
             messages.error(request, "Aucun employé trouvé, veuillez vérifier le nom")
             return redirect(request.META.get('HTTP_REFERER'))
         
-        company = Company.objects.filter(name ="Tayplast")[0]
+        company = Company.objects.filter(name ="Ln Plast")[0]
         ####################### Pointage #######################
         points = Point.objects.filter(user = user)
         points = points.filter(start_date__gte = start_date)
@@ -2263,7 +2263,7 @@ def global_points(request):
         for i in range(users.__len__()):
             users[i].calculated_presence_time = users[i].presence_time(start_date, end_date)
             users[i].calculated_absence_time = users[i].absence_time(start_date, end_date)
-        company = Company.objects.filter(name ="Tayplast")[0]
+        company = Company.objects.filter(name ="Ln Plast")[0]
         template = loader.get_template('production/global_points.html')
         context = {
             "start_date": start_date,
@@ -2287,7 +2287,7 @@ def global_points(request):
 
 
 def print_salaries(request):
-    company = Company.objects.filter(name ="Tayplast")[0]
+    company = Company.objects.filter(name ="Ln Plast")[0]
     salaries = Salary.objects.filter(valid = False)
     total_salaries = 0
     for salary in salaries:
@@ -2417,7 +2417,7 @@ def validate_holiday_request(request, slug):
         user = holiday_request.user
         start_date = holiday_request.start_date
         end_date = holiday_request.end_date
-        company = Company.objects.filter(name ="Tayplast")[0]
+        company = Company.objects.filter(name ="Ln Plast")[0]
         template = loader.get_template('production/holiday_report.html')
         context = {
             "start_date": start_date,
@@ -2447,7 +2447,7 @@ def print_holiday_request(request, slug):
     validation_date = holiday_request.validation_date
     validator = holiday_request.validator
     current_user = request.user
-    company = Company.objects.filter(name ="Tayplast")[0]
+    company = Company.objects.filter(name ="Ln Plast")[0]
     template = loader.get_template('production/holiday_report.html')
     context = {
         "start_date": start_date,
@@ -2490,7 +2490,7 @@ def delete_holiday_request(request, slug):
 
 def employee(request, slug):
     user = get_object_or_404(Profile, slug = slug)
-    company = Company.objects.filter(name ="Tayplast")[0]
+    company = Company.objects.filter(name ="Ln Plast")[0]
 
     if user.job_position.name == "Opérateur Extrusion":
         coils =  Coil.objects.filter(user=user.user)
@@ -2736,9 +2736,9 @@ def print_ticket_no_qr(request, slug):
     coil.save()
     template = loader.get_template('production/coil_ticket_no_qr.html')
     try:
-        company = Company.objects.filter(name='Tayplast')[0]
+        company = Company.objects.filter(name='Ln Plast')[0]
     except:
-        company = 'Tayplast'
+        company = 'Ln Plast'
     context = {
         "user": request.user,
         "company": company,
@@ -2762,9 +2762,9 @@ def print_issue_ticket_no_qr(request, slug):
     coil = get_object_or_404(Coil, slug=slug)
     template = loader.get_template('production/coil_issue_ticket_no_qr.html')
     try:
-        company = Company.objects.filter(name='Tayplast')[0]
+        company = Company.objects.filter(name='Ln Plast')[0]
     except:
-        company = 'Tayplast'
+        company = 'Ln Plast'
     context = {
         "user": request.user,
         "company": company,
@@ -3110,7 +3110,7 @@ class TrashCreateView(View):
                 machine = form.machine
                 weight = form.weight
                 user = request.user
-                company = Company.objects.get(name="Tayplast")
+                company = Company.objects.get(name="Ln Plast")
                 ref = get_random_string(15)
                 trash = Trash(ref=ref, date=timezone.now(), user=user, weight=weight, machine=machine, trash_type=trash_type, whereabouts=company, state="PENDING")
                 trash.save()
@@ -3684,7 +3684,7 @@ def recap(request):
 
         if request.user.profile.job_position.name == "Opérateur Extrusion":
         
-            company = Company.objects.filter(name ="Tayplast")[0]
+            company = Company.objects.filter(name ="Ln Plast")[0]
             ####################### Coil List #######################
             coil_list = Coil.objects.filter(user = request.user)
             coil_list = coil_list.filter(creation_date__gte = start_time)
@@ -3755,7 +3755,7 @@ def recap(request):
     
         elif request.user.profile.job_position.name == "Opérateur Façonnage":
     
-            company = Company.objects.filter(name ="Tayplast")[0]
+            company = Company.objects.filter(name ="Ln Plast")[0]
             ####################### Coil List #######################
             coil_list = Coil.objects.filter(shaper = request.user)
             coil_list = coil_list.filter(shaping_date__gte = start_time)
@@ -3839,7 +3839,7 @@ def recap(request):
     
         elif request.user.profile.job_position.name == "Mélangeur":
     
-            company = Company.objects.filter(name ="Tayplast")[0]
+            company = Company.objects.filter(name ="Ln Plast")[0]
             ####################### Production List #######################
 
             order_list = Order.objects.filter(user = request.user)
@@ -3986,7 +3986,7 @@ def admin_recap(request):
 
         if user.profile.job_position.name == "Opérateur Extrusion":
         
-            company = Company.objects.filter(name ="Tayplast")[0]
+            company = Company.objects.filter(name ="Ln Plast")[0]
             ####################### Coil List #######################
             coil_list = Coil.objects.filter(user = user)
             coil_list = coil_list.filter(creation_date__gte = start_time)
@@ -4057,7 +4057,7 @@ def admin_recap(request):
     
         elif user.profile.job_position.name == "Opérateur Façonnage":
     
-            company = Company.objects.filter(name ="Tayplast")[0]
+            company = Company.objects.filter(name ="Ln Plast")[0]
             ####################### Coil List #######################
             coil_list = Coil.objects.filter(shaper = user)
             coil_list = coil_list.filter(shaping_date__gte = start_time)
@@ -4141,7 +4141,7 @@ def admin_recap(request):
     
         elif user.profile.job_position.name == "Mélangeur":
     
-            company = Company.objects.filter(name ="Tayplast")[0]
+            company = Company.objects.filter(name ="Ln Plast")[0]
             ####################### Production List #######################
 
             order_list = Order.objects.filter(user = user)

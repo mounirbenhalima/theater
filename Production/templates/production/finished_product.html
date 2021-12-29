@@ -10,61 +10,7 @@
     {% csrf_token %}
 
     <div class="form-row">
-    <label>Gamme</label>
-      <div class="col-md-3 mr-5">
-      <select name="range" id="range">
-        <option value=None>---------</option>
-      {% for range in ranges %}
-        <option value="{{range.slug}}">{{ range.name }}</option>
-      {% endfor %}
-      </select>
-      </div>
-      <label>Capacité</label>
-      <div class="col-md-2 ">
-      <select name="capacity" id="capacity">
-        <option value=None>------</option>
-        <option value="PM">Petit Modèle</option>
-        <option value="MM">Moyen Modèle</option>
-        <option value="GM">Grand Modèle</option>
-      </select>
-      </div>
-
-      <label>Couleur</label>
-      <div class="col-md-4">
-      <select name="color" id="color">
-        <option value=None>---------</option>
-        {% for color in colors %}
-        <option value="{{color.slug}}">{{color}}</option>
-        {% endfor %}
-      </select>
-      </div>
-      <p><br><br></p>
-      <label>&nbsp;Lien</label>
-      <div class="col-md-3">
-      <select name="link" id="link">
-        <option value=None>---------</option>
-        <option value="AVEC_LIEN">Avec Lien</option>
-        <option value="SANS_LIEN">Sans Lien</option>
-      </select>
-      </div>
-      <label>Parfumé</label>
-      <div class="col-md-3 ">
-      <select name="perfume" id="perfume">
-        <option value=None>---------</option>
-        <option value="PERFUMED">Parfumé</option>
-        <option value="NOT_PERFUMED">Non Parfumé</option>
-      </select>
-      </div>
-      <label>Parfum</label>
-      <div class="col-md-3 ">
-      <select name="flavor" id="flavor">
-        <option value=None>---------</option>
-        {% for flavor in flavors %}
-        <option value="{{flavor.slug}}">{{flavor}}</option>
-        {% endfor %}
-      </select>
-      </div>
-      <p><br><br></p>
+    
       <div class="col-md-4 mb-3 produc-list-u">
         {{ form.product.label }}
         {{form.product}}
@@ -73,7 +19,7 @@
         {{ form.machine.label }}
         {{form.machine}}
       </div>
-      <div class="col-md-3 mb-3">
+      <div class="col-md-4 mb-3">
         {{ form.quantity_produced.label }}
         {{form.quantity_produced}}
       </div>

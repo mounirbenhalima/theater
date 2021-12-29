@@ -101,7 +101,7 @@ class TrashOutForm(forms.ModelForm):
     
     destination = forms.ModelChoiceField(
         label="Destination",
-        queryset=Company.objects.exclude(name="Tayplast").all(),
+        queryset=Company.objects.exclude(name="Ln Plast").all(),
         widget=forms.Select(
             attrs={
                 "class": "form-control",
