@@ -11,12 +11,13 @@
     <meta charset="UTF-8" />
     <title>Etiquette Bobine</title>
     <link href="{% static 'MDB/css/bootstrap.min.css' %}" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/twitter-bootstrap/3.3.7/css/bootstrap.min.css" />
     <style type="text/css">
     </style>
   </head>
   <body>
     <div style="margin: auto;">
-        <img id='barcode' src="https://api.qrserver.com/v1/create-qr-code/?data={{coil.ref}}" alt="" title="{{coil.ref}}" width="150" height="150"/>
+      <img src="https://chart.googleapis.com/chart?cht=qr&chl={{coil.ref}}&chs=160x160&chld=L|0" class="qr-code img-thumbnail img-responsive" />
   </div>
       <div class="card">
 
