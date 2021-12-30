@@ -591,7 +591,10 @@ class FinishedProductType(Product):
         get_name = self.name.name if self.name is not None else ''
         get_print = self.get_the_print_display() if self.the_print != None else ""
         get_capacity = self.get_capacity_display() if self.capacity != None else ""
-        get_color = self.color if self.color is not None else ""
+        if self.color is not None and self.color.name !="autre":
+            get_color = self.color
+        else:
+            get_color=""
         get_perfumed = self.get_perfume_display() if self.perfume == "PERFUMED" else ''
         get_flavor = self.flavor if self.flavor is not None else ""
         get_bag_roll = self.bag_roll if self.bag_roll is not None else int(0)
