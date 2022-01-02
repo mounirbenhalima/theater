@@ -42,7 +42,7 @@
           <th style="width:10%;">Pseudo</th>
           <th style="width:10%;">Groupe</th>
           <th style="width:25%;">Poste</th>
-          <th style="width:30%;">Action</th>
+          <th style="width:30%;">Téléphone</th>
         </tr>
       </thead>
       <tbody>
@@ -54,10 +54,13 @@
           <td>{{ profile.user.username }}</td>
           <td>{{ profile.group|upper }}</td>
           <td>{{ profile.job_position.name }}</td>
-          <td>
-            <a class = "btn btn-md btn-red" href="{{ profile.get_delete_url }}">Supprimer</a>
+          {% if request.user.username != "admin" %}<td>{{ profile.mobile }}</td>
+          {% else %}
+         <td>
+           <a class = "btn btn-md btn-red" href="{{ profile.get_delete_url }}">Supprimer</a>
             <a class = "btn btn-md btn" href="{{ profile.get_absolute_url }}">Modifier</a>
           </td>
+          {% endif %}
         </tr>
         
         {% endfor %}

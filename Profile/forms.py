@@ -5,6 +5,9 @@ from django.contrib.auth.forms import AuthenticationForm
 from .models import Profile, JobPosition, HolidayRequest, Point, HOLIDAY_MOTIVES
 from Company.models import Company
 
+class DateInput(forms.DateInput):
+    input_type='date'
+
 class UserRegisterForm(UserCreationForm):
     first_name = forms.CharField(
         label="Prénom",
@@ -124,22 +127,20 @@ class ProfileForm(forms.ModelForm):
     birth_day = forms.DateField(
         label="Date de Naissance",
         required=False,
-        widget=forms.DateInput(
-        attrs={
-            "class": "form-control",
-            "type": "date"
-        }
-    ))
+        widget=DateInput(
+            attrs={
+                "class": "form-control",
+            }
+        ))
 
     hiring_date = forms.DateField(
         label="Date de Recrutement",
         required=False,
-        widget=forms.DateInput(
-        attrs={
-            "class": "form-control",
-            "type": "date"
-        }
-    ))
+        widget=DateInput(
+            attrs={
+                "class": "form-control",
+            }
+        ))
     rest_holiday = forms.IntegerField(
         label="Jours de Congé Restants",
         required=True,
@@ -228,9 +229,6 @@ class JobPositionForm(forms.ModelForm):
         model = JobPosition
         exclude = ('slug',)
         fields = '__all__'
-
-class DateInput(forms.DateInput):
-    input_type='date'
 
 class HolidayRequestForm(forms.ModelForm):
     class Meta:

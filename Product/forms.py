@@ -178,8 +178,9 @@ class FlavorForm(forms.ModelForm):
 class RawMatterForm(forms.ModelForm):
     class Meta:
         model = RawMatter
-        fields = ['name', 'combined_range', 'weight', 'type_name','perfume', 'brand', 'color', 'flavor']
+        fields = ['name', 'combined_range', 'weight', 'type_name','perfume', 'brand', 'color', 'flavor', 'price']
     name = forms.ModelChoiceField(
+        label="Gamme",
         queryset=Range.objects.all(),
         widget=forms.Select(
             attrs={
@@ -210,6 +211,15 @@ class RawMatterForm(forms.ModelForm):
                                           "type": "number",
                                       }
                                   ))
+    price = forms.FloatField(label="Prix Unitaire",
+                                  required=False,
+                                  widget=forms.TextInput(
+                                      attrs={
+                                          "class": "form-control",
+                                          "type": "number",
+                                          "step":"0.1",
+                                      }
+                                  ))
     type_name = forms.CharField(label="Type",
                                 widget=forms.Select(
                                     choices=TYPE_PRODUCT,
@@ -225,6 +235,7 @@ class RawMatterForm(forms.ModelForm):
                                     }
                                 ))
     brand = forms.ModelChoiceField(
+        label="Marque",
         queryset=Brand.objects.all(),
         widget=forms.Select(
             attrs={
@@ -232,6 +243,7 @@ class RawMatterForm(forms.ModelForm):
             }
         ))
     color = forms.ModelChoiceField(
+        label="Couleur",
         queryset=Color.objects.all(),
         widget=forms.Select(
             attrs={
@@ -365,7 +377,7 @@ class CoilTypeForm(forms.ModelForm):
 class FinalProductForm(forms.ModelForm):
     class Meta:
         model = FinishedProductType
-        fields = ['name', 'ref','package','bag_roll','roll_package','labelling', 'capacity', 'quantity', 'height', 'width', 'weight', 'the_print','type_name', 'color','perfume','flavor' ]
+        fields = ['name', 'ref','package','bag_roll','roll_package','labelling', 'capacity', 'quantity', 'height', 'width', 'weight', 'the_print','type_name', 'color','perfume','flavor' ,'price']
 
     name = forms.ModelChoiceField(
         label="Gamme",
@@ -430,6 +442,15 @@ class FinalProductForm(forms.ModelForm):
                                       "type": "number",
                                   }
                               ))
+    price = forms.FloatField(label="Prix Unitaire",
+                                  required=False,
+                                  widget=forms.TextInput(
+                                      attrs={
+                                          "class": "form-control",
+                                          "type": "number",
+                                          "step":"0.1",
+                                      }
+                                  ))
     height = forms.FloatField(label="Longueur du sac",
                               required=False,
                               widget=forms.TextInput(
@@ -496,10 +517,6 @@ class FinalProductForm(forms.ModelForm):
                 "class": "form-control",
             }
         ))
-    supplier = forms.ModelMultipleChoiceField(label="Fournisseur(s)",
-                                              queryset=Contact.objects.all(),
-                                              widget=forms.CheckboxSelectMultiple(),
-                                              required=False)
 
     def clean(self):
         cleaned_data = super().clean()
@@ -707,6 +724,7 @@ class SparePartForm(forms.ModelForm):
                                       attrs={
                                           "class": "form-control",
                                           "type": "number",
+                                          "step":"0.1",
                                       }
                                   ))
 

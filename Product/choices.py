@@ -27,9 +27,11 @@ PRINT_CHOICES = (
 
 SIZE = (
     (None,"---------"),
+    ("MINI","Mini"),
     ("SMALL","Petit Modèle"),
     ("MEDIUM","Moyen Modèle"),
     ("BIG","Grand Modèle"),
+    ("GGM","GGM"),
 )
 
 RANGE_CATEGORY = (

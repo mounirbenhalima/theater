@@ -202,72 +202,7 @@
       </div>
 
 
-      <div class="card">
-      <h1 style="text-align: center;">
-          <strong>Labelling</strong>
-          </h1>
-            <h2 style="text-align: left;">
-          {% comment %} <strong>Poids Total </strong>: {{ coil_total}} Kg {% endcomment %}
-          </h2>
-        <table class="table order-content">
-          <thead>
-            <tr>
-              <th style="width: 45%;">Labelling</th>
-              <th style="width: 15%;">Consommation</th>
-              <th style="width: 15%;">Achat</th>
-              <th style="width: 10%;">Stock</th>
-              <th style="width: 15%;">Stock Atelier</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for labelling in labellings %}
-            <tr class="order-item">
-              <td>{{ labelling }}</td>
-              <td>{{ labelling.calculated_quantity_consumed }}</td>
-              <td>{{ labelling.calculated_quantity_brought }}</td>
-              <td>{{ labelling.quantity}}</td>
-              <td>{{ labelling.quantity_workshop}}</td>
-            </tr>
-            {% endfor %}
-
-          </tbody>
-        </table>
-      </div>
-
-
-      <div class="card">
-      <h1 style="text-align: center;">
-          <strong>Lien de Fermeture</strong>
-          </h1>
-            <h2 style="text-align: left;">
-          {% comment %} <strong>Poids Total </strong>: {{ coil_total}} Kg {% endcomment %}
-          </h2>
-        <table class="table order-content">
-          <thead>
-            <tr>
-              <th style="width: 45%;">Lien</th>
-              <th style="width: 15%;">Consommation</th>
-              <th style="width: 15%;">Achat</th>
-              <th style="width: 10%;">Stock</th>
-              <th style="width: 15%;">Stock Atelier</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for handle in handles %}
-            <tr class="order-item">
-              <td>{{ handle }}</td>
-              <td>{{ handle.calculated_quantity_consumed }}</td>
-              <td>{{ handle.calculated_quantity_brought }}</td>
-              <td>{{ handle.quantity}}</td>
-              <td>{{ handle.quantity_workshop}}</td>
-            </tr>
-            {% endfor %}
-
-          </tbody>
-        </table>
-      </div>
-
-
+     
       <div class="card">
       <h1 style="text-align: center;">
           <strong>Pièces de Rechanges</strong>
@@ -428,76 +363,7 @@
           </tbody>
         </table>
       </div>
-      
-          <div class="card">
-          <h1 style="text-align: center;">
-          <strong>Stocks Par Gamme</strong>
-          </h1>
-            <h2 style="text-align: left;">
-          {% comment %} <strong>Poids Total </strong>: {{ coil_total}} Kg {% endcomment %}
-          </h2>
-        <table class="table order-content">
-          <thead>
-            <tr>
-              <th style="width: 50%;">Gamme</th>
-              <th style="width: 25%;">Stock</th>
-              <th style="width: 25%;">Stock Externe</th>
-            </tr>
-          </thead>
-          <tbody>
-            {% for cr in product_combined_ranges %}
-            <tr class="order-item">
-              <td>{{ cr|upper }}</td>
-              <td>{{ cr.calculated_main_stock|floatformat:0}}</td>
-              <td>{{ cr.calculated_external_stock|floatformat:0}}</td>
-            </tr>
-            {% endfor %}
-
-          </tbody>
-        </table>
-      </div>
-      
-      <h1 style="text-align: center;">
-        <strong>Noir/Couleur</strong>
-      </h1>
-      <h2 style="text-align: left;">
-          <strong>Total Production </strong>: {{ total_production|floatformat:0 }}
-          </h2>
-      <h2 style="text-align: left;">
-          <strong>Total Ventes </strong>: {{ total_sales|floatformat:0 }}
-          </h2>
-      <div class="card">
-        <table class="table order-content">
-          <thead>
-            <tr>
-              <th style="width: 32%;">Gamme</th>
-              <th style="width: 17%;">Prod. Noir</th>
-              <th style="width: 17%;">Prod. Couleurs</th>
-              <th style="width: 17%;">Ventes Noir</th>
-              <th style="width: 17%;">Ventes Couleurs</th>
-            </tr>
-          </thead>
-          <tbody>
-          {% for cr in product_combined_ranges %}
-            <tr class="order-item">
-              <td>{{ cr|upper }}</td>
-              <td>{{ cr.calculated_black_produced|floatformat:0 }}  ({{ cr.calculated_black_produced_pourcentage|floatformat:0 }}%)</td>
-              <td>{{ cr.calculated_color_produced|floatformat:0 }}  ({{ cr.calculated_color_produced_pourcentage|floatformat:0 }}%)</td>
-              <td>{{ cr.calculated_black_sold|floatformat:0 }}  ({{ cr.calculated_black_sold_pourcentage|floatformat:0 }}%)</td>
-              <td>{{ cr.calculated_color_sold|floatformat:0 }}  ({{ cr.calculated_color_sold_pourcentage|floatformat:0 }}%)</td>
-            </tr>
-          {% endfor %}
-          <tr class="order-item">
-              <td><h2>Total</h2></td>
-              <td><h2>{{ black_production|floatformat:0 }} ({{ black_production_pourcentage|floatformat:0 }}%)</h2></td>
-              <td><h2>{{ color_production|floatformat:0 }} ({{ color_production_pourcentage|floatformat:0 }}%)</h2></td>
-              <td><h2>{{ black_sales|floatformat:0 }} ({{ black_sales_pourcentage|floatformat:0 }}%)</h2></td>
-              <td><h2>{{ color_sales|floatformat:0 }} ({{ color_sales_pourcentage|floatformat:0 }}%)</h2></td>
-            </tr>
-          </tbody>
-        </table>
-      </div>
-
+ 
     <div class="card">
       <h1 style="text-align: center;">
           <strong>Ventes Par Client</strong>
