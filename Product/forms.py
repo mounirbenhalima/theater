@@ -377,7 +377,7 @@ class CoilTypeForm(forms.ModelForm):
 class FinalProductForm(forms.ModelForm):
     class Meta:
         model = FinishedProductType
-        fields = ['name', 'ref','package','bag_roll','roll_package','labelling', 'capacity', 'quantity', 'height', 'width', 'weight', 'the_print','type_name', 'color','perfume','flavor' ,'price']
+        fields = ['name', 'ref','package','bag_roll','roll_package', 'capacity', 'quantity', 'height', 'width', 'weight', 'the_print','type_name', 'color','perfume','flavor' ,'price']
 
     name = forms.ModelChoiceField(
         label="Gamme",
@@ -500,15 +500,6 @@ class FinalProductForm(forms.ModelForm):
                                           "type": "number",
                                       }
                                   ))
-    labelling = forms.ModelChoiceField(
-        label="Labelling",
-        required=False,
-        queryset=Labelling.objects.all(),
-        widget=forms.Select(
-            attrs={
-                "class": "form-control",
-            }
-        ))
     color = forms.ModelChoiceField(
         required=False,
         queryset=Color.objects.all(),

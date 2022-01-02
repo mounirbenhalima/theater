@@ -31,7 +31,6 @@ SIZE = (
     ("SMALL","Petit Modèle"),
     ("MEDIUM","Moyen Modèle"),
     ("BIG","Grand Modèle"),
-    ("BIG+","Grand Modèle +"),
 )
 
 RANGE_CATEGORY = (
