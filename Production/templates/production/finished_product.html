@@ -10,16 +10,28 @@
     {% csrf_token %}
 
     <div class="form-row">
+      <div class="col-md-12 mb-5">
+        <label class="mt-0 mb-0"> Opérateur</label>
+        <select name="user" id="user">
+        {% for user in users%}
+          <option value="{{user.username}}">{{user}}</option>
+        {% endfor %}
+        </select>
+      </div>
+      <div class="col-md-3 mb-3 produc-list-u">
+        <label class="mt-0 mb-0"> Identifiant Opérateur</label>
+        <input class="form-control" type="search" minlength="3" maxlength="3"  name="user-id" id="user-id" placeholder = "Identifiant">
+      </div>
     
-      <div class="col-md-4 mb-3 produc-list-u">
+      <div class="col-md-3 mb-3 produc-list-u">
         {{ form.product.label }}
         {{form.product}}
       </div>
-      <div class="col-md-4 mb-3">
+      <div class="col-md-3 mb-3">
         {{ form.machine.label }}
         {{form.machine}}
       </div>
-      <div class="col-md-4 mb-3">
+      <div class="col-md-3 mb-3">
         {{ form.quantity_produced.label }}
         {{form.quantity_produced}}
       </div>

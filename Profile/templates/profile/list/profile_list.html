@@ -27,9 +27,10 @@
     <div class="col-sm-12 col-md-4">
       <form class="form-inline md-form mb-4">
         <input class="form-control" type="text" placeholder="Search" aria-label="Search" name='q'
-          value='{{ request.GET.q }}'>
-        <button class="btn btn-outline-dark btn-rounded btn-sm my-0" type="submit">Search</button>
+        value='{{ request.GET.q }}'>
+      <button class="btn btn-outline-dark btn-rounded btn-sm my-0" type="submit">Search</button>
       </form>
+      <a class="btn btn-outline-dark mb-3 btn-rounded btn-lg my-0"  href="{% url 'register' %}">Ajouter</a>
     </div>
   </div>
 

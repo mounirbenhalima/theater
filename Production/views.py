@@ -3276,7 +3276,9 @@ class ShapingCreateView(View):
 
     def get(self, request, *arg, **kwargs):
         form = ShapingForm()
+        users = User.objects.exclude(username = request.user.username ).filter(profile__job_position__name = "Opérateur Façonnage")
         context = {
+            'users':users,
             'form': form,
         }
         return render(self.request, 'production/shaping.html', context)
@@ -3289,6 +3291,18 @@ class ShapingCreateView(View):
                 coil = None
                 form = form.save(commit=False)
                 product = request.POST.get('_ref')
+                user = request.POST.get('user')
+                user_id = request.POST.get('user-id')
+                user_find = User.objects.get(username = user)
+                try:
+                    user_find2 = User.objects.get(username = user_id)
+                except:
+                    user_find2 = None
+                if user_find==user_find2:
+                    user = user_find
+                else:
+                    messages.error(request, "Opérateur Erroné")
+                    return redirect(reverse_lazy("production:shaping-process"))
                 try:
                     coil = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product)
                     coil_type = coil.type_coil
@@ -3296,7 +3310,6 @@ class ShapingCreateView(View):
                     coil = None
                 if coil != None:
                     machine = form.machine
-                    user = request.user
                     shaping = Production(date=timezone.now(),coil = coil, user=user, coil_type = coil_type ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
                     mchn = Machine.objects.get(slug=machine.slug)
                     mchn.state = "OCCUPIED"
@@ -3450,8 +3463,10 @@ class FinishedProductCreateView(View):
 
     def get(self, request, *arg, **kwargs):
         form = FinishedProductForm()
+        users = User.objects.exclude(username = request.user.username ).filter(profile__job_position__name = "Opérateur Façonnage")
         context = {
             'form': form,
+            'users':users,
             'ranges':Range.objects.all(),
             'colors':Color.objects.all(),
             'flavors':Flavor.objects.all(),
@@ -3464,6 +3479,18 @@ class FinishedProductCreateView(View):
         if self.request.method == "POST":
             if form.is_valid():
                 form = form.save(commit=False)
+                user = request.POST.get('user')
+                user_id = request.POST.get('user-id')
+                user_find = User.objects.get(username = user)
+                try:
+                    user_find2 = User.objects.get(username = user_id)
+                except:
+                    user_find2 = None
+                if user_find==user_find2:
+                    user = user_find
+                else:
+                    messages.error(request, "Opérateur Erroné")
+                    return redirect(reverse_lazy("production:shaping-process"))
 
                 # product_range = request.POST.get("range")
                 # product_capacity = request.POST.get("capacity")
@@ -3493,7 +3520,6 @@ class FinishedProductCreateView(View):
                     
                 machine = form.machine
                 quantity = form.quantity_produced
-                user = request.user
                 production = Production(date=timezone.now(), user=user, product=product, quantity_produced=quantity,
                                         machine=machine, process_type="FINISHED_PRODUCT", state="PENDING")
                 production.save()
