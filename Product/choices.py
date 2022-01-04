@@ -13,6 +13,8 @@ PRINT_CHOICES = (
     ("TASSAOUK_AL_AFDAL", "Tassaouk Al Afdal"),
     ("FRUITS_ET_LEGUMES", "Fruits Et Légumes"),
     ("SHOP_EXPRESS", "Shop Express"),
+    ("SHOPPING", "Shopping"),
+    ("FAST_FOOD", "Fast Food"),
     ("SURPRISE", "Surprise"),
     ("FRED_PERRY", "Fred Perry"),
     ("I_LOVE_SHOPPING", "I Love Shopping"),
@@ -21,6 +23,7 @@ PRINT_CHOICES = (
     ("PHARMACIE", "Pharmacie"),
     ("PIZZA", "Pizza"),
     ("BOUCHERIE", "Boucherie"),
+    ("WELCOME", "Welcome"),
     ("CUSTOM", "Personnalisé"),
     (None, "--------"),
 )
@@ -31,6 +34,7 @@ SIZE = (
     ("SMALL","Petit Modèle"),
     ("MEDIUM","Moyen Modèle"),
     ("BIG","Grand Modèle"),
+    ("GGM","Grand Modèle +"),
 )
 
 RANGE_CATEGORY = (
