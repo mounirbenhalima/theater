@@ -3,6 +3,7 @@ from django.contrib.auth.models import User
 from django.urls import reverse
 from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
+from django.utils.crypto import get_random_string
 from .choices import PROCESS_TYPE, STATE_PRODUCTION, CONSUMED, CORRECTION_TYPE
 from Product.choices import TYPE_PRODUCT, PERFUMED
 
@@ -19,6 +20,8 @@ class Production(models.Model):
         'Product.CoilType', on_delete=models.SET_NULL, related_name="BobineCible" , blank=True, null=True)
     coil = models.ForeignKey("Product.Coil", null=True, related_name="Bobine", blank=True, on_delete= models.CASCADE)
     quantity_produced = models.DecimalField(default =0, null=True,decimal_places=1, max_digits=5, blank=True)
+    weight = models.DecimalField(default =0, null=True,decimal_places=1, max_digits=6, blank=True)
+    ideal_weight = models.DecimalField(default =0, null=True,decimal_places=1, max_digits=6, blank=True)
     remaining = models.FloatField(null=True, blank=True)
     machine = models.ForeignKey(
         'Machine.Machine', on_delete=models.SET_NULL, blank=True, null=True)
@@ -54,11 +57,14 @@ class Production(models.Model):
     def save(self, *args, **kwargs):
         get_coil = self.coil.ref if self.coil is not None else ''
         if self.process_type != "MIXING":
-            self.ref_code = f'{self.id}{get_coil}'
+            self.ref_code = f'{self.id}{get_random_string(20)}'
         if self.slug is None or self.slug == "":
-            tmp_slug = f'{self.get_process_type_display()}-{self.id}{get_coil}'
+            tmp_slug = f'{self.get_process_type_display()}-{self.ref_code}{get_coil}'
             self.slug = slugify(tmp_slug)
         super(Production, self).save(*args, **kwargs)
+
+    def weight_difference(self):
+        return self.weight - self.ideal_weight
 
 
     class Meta:

@@ -294,6 +294,8 @@ def filter_finished_product(request):
     date_max = request.GET.get('date_max')
     is_finished = request.GET.get('_is_finished')
     is_not_finished = request.GET.get('_is_not_finished')
+    gain = request.GET.get('_gain')
+    loss = request.GET.get('_loss')
     id_quantity = request.GET.get('_id_quantity')
 
     
@@ -324,6 +326,11 @@ def filter_finished_product(request):
         qs = qs.filter(state="FINISHED")
     if is_not_finished == 'on':
         qs = qs.filter(state="PENDING")
+    
+    if gain == 'on':
+        qs = qs.annotate(difference=F('weight')-F('ideal_weight')).filter(difference__lte=0)
+    if loss == 'on':
+       qs = qs.annotate(difference=F('weight')-F('ideal_weight')).filter(difference__gt=0)
 
     return qs
 #
@@ -1060,14 +1067,19 @@ class ConsultingFinishedProductListView(ListView):
     #     return qs
     def get(self, request, *arg, **kwargs):
         qs = filter_finished_product(self.request)
+        for i in range(qs.__len__()):
+            qs[i].calculated_weight_difference = qs[i].weight_difference()
         total_weight = 0
         total_packages = 0
+        real_total_weight = 0
         for p in qs:    
             total_weight += p.quantity_produced * p.product.weight * p.product.roll_package / 1000
+            real_total_weight += p.weight
             total_packages += p.quantity_produced
         context = {
             'object_list': qs,
             'total_weight': total_weight,
+            'real_total_weight': real_total_weight,
             'total_packages': total_packages,
         }
         return render(self.request, 'production/finished_product_consulting.html', context)
@@ -3543,7 +3555,7 @@ class ProductionListView(ListView):
 
     def get_queryset(self, **kwargs):
         queryset = Production.objects.filter(
-            user=self.request.user, state="PENDING", process_type="FINISHED_PRODUCT")
+            state="PENDING", process_type="FINISHED_PRODUCT")
         return queryset
 
 

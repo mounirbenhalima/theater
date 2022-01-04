@@ -406,10 +406,13 @@ def final_product_entry(request):
         difference = 0
         qte = 0
         quantity = int(request.POST.get("quantity"))
+        weight = Decimal(request.POST.get("weight"))
         production_slug = request.POST.get("get_production")
         production = get_object_or_404(Production, slug = production_slug)
         if production.state == "PENDING":
             production.state = "FINISHED"
+            production.weight = weight
+            production.ideal_weight = (production.quantity_produced * production.product.weight * production.product.roll_package )/1000
             production.save()
             product = production.product
             difference = quantity - production.quantity_produced
