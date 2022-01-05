@@ -5,7 +5,7 @@ from django.template.defaultfilters import slugify
 from django.db.models import Q
 
 from django.core.validators import MinValueValidator
-from .choices import SIZE, RANGE_CATEGORY, TYPE_TRASH,TAPE_TYPE, PRINT_CHOICES, TYPE_PRODUCT, TYPE_PIECE, PERFUMED, COIL_STATUS, DEFECTIVE_CHOICES, PRINTED, TRASH_STATE
+from .choices import SIZE, RANGE_CATEGORY, TYPE_TRASH,TAPE_TYPE, PRINT_CHOICES, TYPE_PRODUCT, TYPE_PIECE, PERFUMED, COIL_STATUS, DEFECTIVE_CHOICES, PRINTED, TRASH_STATE, PACKAGE_TYPES
 from django.contrib.auth.models import User
 from Production.models import Production
 from StockManager.models import Order, SparePartConsumption
@@ -561,6 +561,8 @@ class FinishedProductType(Product):
     capacity = models.CharField("Taille",max_length=255, choices=SIZE, blank=True, null=True)
     the_print = models.CharField("Impression", max_length=250,
                             choices=PRINT_CHOICES, null=True, blank=True)
+    package_type = models.CharField("Type d'Emballage", max_length=250,
+                            choices=PACKAGE_TYPES, null=True, blank=True)
     micronnage = models.FloatField(
         verbose_name="Micronnage", default=0, blank=True, null=True)
     bag_roll = models.PositiveIntegerField(
@@ -575,6 +577,7 @@ class FinishedProductType(Product):
 
     def save(self, *args, **kwargs):
         get_name = self.name.name if self.name is not None else ''
+        get_package_type = self.get_package_type_display() if self.package_type != None else ""
         get_print = self.get_the_print_display() if self.the_print != None else ""
         get_capacity = self.get_capacity_display() if self.capacity != None else ""
         get_color = self.color if self.color != None else ""
@@ -582,13 +585,14 @@ class FinishedProductType(Product):
         get_flavor = self.flavor if self.flavor is not None else ""
         get_bag_roll = self.bag_roll if self.bag_roll is not None else int(0)
         get_roll_package = self.roll_package if self.roll_package is not None else int(0)
-        slug_finishedproducttype = f"finishedproducttype-{get_name}-{get_capacity}l-{get_color}-{get_print}-{get_perfumed}-{get_flavor}-{get_bag_roll}x{get_roll_package}"
+        slug_finishedproducttype = f"finishedproducttype-{get_name}-{get_capacity}l-{get_color}-{get_print}-{get_perfumed}-{get_flavor}-{get_bag_roll}x{get_roll_package}-{get_package_type}"
         # if self.slug is None:
         self.slug = slugify(slug_finishedproducttype)
         self.product_designation = f"Produit Fini {self.__str__().upper()}"
         super(FinishedProductType, self).save(*args, **kwargs)
 
     def __str__(self):
+        get_package_type = self.get_package_type_display() if self.package_type != None else ""
         get_name = self.name.name if self.name is not None else ''
         get_print = self.get_the_print_display() if self.the_print != None else ""
         get_capacity = self.get_capacity_display() if self.capacity != None else ""
@@ -601,9 +605,9 @@ class FinishedProductType(Product):
         get_bag_roll = self.bag_roll if self.bag_roll is not None else int(0)
         get_roll_package = self.roll_package if self.roll_package is not None else int(0)
         if self.flavor is not None:
-            return f"{get_name} {get_capacity} {get_color} ({get_print}) [{get_bag_roll}x{get_roll_package}] [{get_perfumed} {get_flavor}]"
+            return f"{get_name} {get_capacity} {get_color} ({get_print}) [{get_package_type}:{get_bag_roll}x{get_roll_package}] [{get_perfumed} {get_flavor}]"
         else:
-            return f"{get_name} {get_capacity} {get_color} ({get_print}) [{get_bag_roll}x{get_roll_package}] {get_perfumed}"
+            return f"{get_name} {get_capacity} {get_color} ({get_print}) [{get_package_type}:{get_bag_roll}x{get_roll_package}] {get_perfumed}"
 
     def quantity_produced(self, start_date, end_date):
         productions = self.ProduitCible.filter(Q(date__lte = end_date) & Q(date__gte = start_date))

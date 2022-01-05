@@ -1,5 +1,5 @@
 from django import forms
-from .choices import PRINT_CHOICES, TYPE_PRODUCT, TYPE_PIECE, TAPE_TYPE, TYPE_TRASH,PERFUMED, RANGE_CATEGORY, SIZE
+from .choices import PRINT_CHOICES, TYPE_PRODUCT, TYPE_PIECE, TAPE_TYPE, TYPE_TRASH,PERFUMED, RANGE_CATEGORY, SIZE, PACKAGE_TYPES
 from .models import (
     Brand,
     Color,
@@ -383,7 +383,7 @@ class CoilTypeForm(forms.ModelForm):
 class FinalProductForm(forms.ModelForm):
     class Meta:
         model = FinishedProductType
-        fields = ['name', 'ref','package','bag_roll','roll_package', 'capacity', 'quantity', 'height', 'width', 'weight', 'the_print','type_name', 'color','perfume','flavor' ,'price']
+        fields = ['name', 'ref','package',"package_type",'bag_roll','roll_package', 'capacity', 'quantity', 'height', 'width', 'weight', 'the_print','type_name', 'color','perfume','flavor' ,'price']
 
     name = forms.ModelChoiceField(
         label="Gamme",
@@ -433,6 +433,15 @@ class FinalProductForm(forms.ModelForm):
                                    "class": "form-control",
                                }
                            ))
+
+    package_type = forms.CharField(label="Type d'Emballage",
+                           widget=forms.Select(
+                               choices=PACKAGE_TYPES,
+                               attrs={
+                                   "class": "form-control",
+                               }
+                           ))
+
     quantity = forms.IntegerField(label="Quantité en Stock",
                                   widget=forms.TextInput(
                                       attrs={

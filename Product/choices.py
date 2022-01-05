@@ -43,6 +43,11 @@ RANGE_CATEGORY = (
     ("FINAL_PRODUCT", "Produit Fini"),
 )
 
+PACKAGE_TYPES = (
+    ("BOX", "Carton"),
+    ("FILM", "Fardeau"),
+)
+
 TYPE_PRODUCT = (
     (None, '---------'),
     ('HAUTE_DENSITE', 'Haute Densité'),
