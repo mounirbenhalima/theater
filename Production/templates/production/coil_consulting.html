@@ -162,6 +162,7 @@
           <th style="width:5%">P.C 2</th>
           <th style="width:5%">P.C 3</th>
           <th style="width:5%">P.C M</th>
+          <th style="width:5%">Déchet</th>
           <th style="width:5%">Anomalies</th>
           <th style="width:5%">Etat</th>
           <th style="width:5%">Date de Vente</th>
@@ -207,6 +208,7 @@
             <td>{{coil.cw2}}</td>
             <td>{{coil.cw3}}</td>
             <td>{{coil.cwm}}</td>
+            <td>{{coil.trash}}</td>
             <td>{% if coil.destroyed is True %} {% elif coil.status == "QUARANTINE" %} En Quarantaine {% elif coil.status == "CUT"%} Coupée {% elif coil.status == "TO_BE_DESTROYED" %} A Détruire {% else %} {{coil.get_defective_display}} {% endif %}</td>
             <td>{% if coil.destroyed is not True %}{{coil.get_status_display}} {% else %} Détruite {% endif %}{% if coil.motive is not None%} :{{ coil.motive }} {% endif %} {% if coil.explanation is not None%} /{{ coil.explanation }} {% endif %}</td>
             <td>{% if coil.sale_date is not None %} {{ coil.sale_date }} {% endif %} </td>

@@ -2862,6 +2862,16 @@ def shaping_coil_list(request):
                 return render(request, 'production/shaping_coil_list.html', context={'object_list': Coil.objects.filter(status="PENDING_SHAPING")})
 
         if coil.cw1 != 0 and coil.cw2 != 0 and coil.cw3 != 0:
+            try:
+                tr = Decimal(request.POST.get("trash"))
+            except:
+                messages.error(request, "Veuillez Remplir Le Déchet Généré.")
+                return render(request, 'production/shaping_coil_list.html', context={'object_list': Coil.objects.filter(shaper = request.user , status="PENDING_SHAPING")})
+            if tr == 0:
+                messages.error(request, "Veuillez Remplir Le Déchet Généré.")
+                return render(request, 'production/shaping_coil_list.html', context={'object_list': Coil.objects.filter(shaper = request.user , status="PENDING_SHAPING")})
+            coil.trash = tr
+
             coil.status = "CONSUMED"
             production = Production.objects.get(
                 coil=coil, process_type="SHAPING", state="PENDING")
@@ -2871,6 +2881,10 @@ def shaping_coil_list(request):
             mchn.save()
             coil.save()
             production.save()
+            ref = get_random_string(15)
+            company = Company.objects.get(name="Ln Plast")
+            trash = Trash(ref=ref, date=timezone.now(), user=production.user, weight=tr, machine=mchn, trash_type=coil.type_coil.type_name, whereabouts=company, state="PENDING")
+            trash.save()
         if cw != 0:
             if coil.cw1 is None or coil.cw1 == 0:
                 coil.cw1 = cw/1000

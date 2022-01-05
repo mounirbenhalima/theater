@@ -385,6 +385,7 @@ class Coil(Product):
     cw2 = models.DecimalField(default = 0, null=True, blank=True, decimal_places=3, max_digits=6)
     cw3 = models.DecimalField(default = 0, null=True, blank=True, decimal_places=3, max_digits=6)
     cwm = models.DecimalField(default = 0, null=True, blank=True, decimal_places=3, max_digits=6)
+    trash = models.DecimalField(default = 0, null=True, blank=True, decimal_places=1, max_digits=6)
 
     parent = models.ForeignKey("Coil",max_length=200, on_delete= models.SET_NULL,null=True, blank=True)
     is_sub = models.BooleanField("Dérivée", default=False, null=True, blank=True)
