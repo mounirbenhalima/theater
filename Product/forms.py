@@ -178,7 +178,7 @@ class FlavorForm(forms.ModelForm):
 class RawMatterForm(forms.ModelForm):
     class Meta:
         model = RawMatter
-        fields = ['name', 'combined_range', 'weight', 'type_name','perfume', 'brand', 'color', 'flavor', 'price']
+        fields = ['name', 'combined_range', 'weight','ref', 'type_name','perfume', 'brand', 'color', 'flavor', 'price']
     name = forms.ModelChoiceField(
         label="Gamme",
         queryset=Range.objects.all(),
@@ -223,6 +223,12 @@ class RawMatterForm(forms.ModelForm):
     type_name = forms.CharField(label="Type",
                                 widget=forms.Select(
                                     choices=TYPE_PRODUCT,
+                                    attrs={
+                                        "class": "form-control",
+                                    }
+                                ))
+    ref = forms.CharField(label="Référence",
+                                widget=forms.TextInput(
                                     attrs={
                                         "class": "form-control",
                                     }

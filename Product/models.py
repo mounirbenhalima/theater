@@ -651,7 +651,8 @@ class RawMatter(Product):
         get_perfumed = self.perfume if self.perfume is not None else ''
         get_flavor = self.flavor if self.flavor is not None else ""
         get_brand = self.brand if self.brand is not None else ''
-        slug_rawmatter = f"rawmatter-{get_brand}-{get_name}-{get_type}-{get_perfumed}-{get_flavor}-{get_color}-{get_weight}Kg-{self.id}"
+        get_ref = self.ref if self.ref is not None else ''
+        slug_rawmatter = f"rawmatter-{get_brand}-{get_ref}-{get_name}-{get_type}-{get_perfumed}-{get_flavor}-{get_color}-{get_weight}Kg-{self.id}"
         if self.slug is None:
             self.slug = slugify(slug_rawmatter)
         self.product_designation = ' '.join(self.__str__().split()).upper()
@@ -664,10 +665,11 @@ class RawMatter(Product):
         get_color = self.color if self.color != None and self.color.name != 'autre' else ""
         get_perfumed = self.get_perfume_display() if self.perfume == 'PERFUMED' else ''
         get_flavor = self.flavor if self.flavor is not None else ""
+        get_ref = self.ref if self.ref is not None else ''
         if self.flavor is not None:
-            return f"[{self.brand.name}] {get_name} {get_type} {get_perfumed} {get_flavor} {get_color} {get_weight} Kg"
+            return f"[{self.brand.name}-{get_ref}] {get_name} {get_type} {get_perfumed} {get_flavor} {get_color} {get_weight} Kg"
         else:
-            return f"[{self.brand.name}] {get_name} {get_type} {get_perfumed} {get_color} {get_weight} Kg"
+            return f"[{self.brand.name}-{get_ref}] {get_name} {get_type} {get_perfumed} {get_color} {get_weight} Kg"
 
     
     def quantity_consumed(self, start_date, end_date):

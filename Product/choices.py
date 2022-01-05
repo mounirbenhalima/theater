@@ -25,6 +25,7 @@ PRINT_CHOICES = (
     ("BOUCHERIE", "Boucherie"),
     ("WELCOME", "Welcome"),
     ("CUSTOM", "Personnalisé"),
+    ("NOT_PRINTED", "Non Imprimé"),
     (None, "--------"),
 )
 
