@@ -337,8 +337,17 @@ def filter_finished_product(request):
 
 def filter_coil(request):
     now = timezone.now()
-    month = now.month - 2
-    now = now.replace(day = 1, month=month, hour = 6)
+    if now.month == 1:
+        month = 11
+        year = now.year - 1
+    elif now.month == 2:
+        month = 12
+        year = now.year - 1
+    else:
+        month = now.month - 2
+        year = now.year
+
+    now = now.replace(day = 1, month=month, year = year, hour = 6)
 
     qs = Coil.objects.filter(creation_date__gte = now)
 

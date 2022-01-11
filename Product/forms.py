@@ -217,7 +217,7 @@ class RawMatterForm(forms.ModelForm):
                                       attrs={
                                           "class": "form-control",
                                           "type": "number",
-                                          "step":"0.1",
+                                          "step":"0.01",
                                       }
                                   ))
     type_name = forms.CharField(label="Type",
