@@ -23,7 +23,7 @@
         <tr>
           <form method="POST" action="{{product.get_add_to_order_url}}">
             {% csrf_token %}
-            <th scope="row">{{ forloop.counter }}</th>
+            <th>{{extrusion.machine.machine_number}}</th>
             <td>{{extrusion.machine|upper}}</td>
             <td>{{extrusion.coil_type|upper}}</td>
             <td class="text-right">

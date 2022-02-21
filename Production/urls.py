@@ -94,6 +94,8 @@ from .views import (
     reset_cws,
     ReportingPage,
     reporting,
+    MiniReportingPage,
+    mini_reporting,
     AdminRecapPage,
     admin_recap
 
@@ -231,5 +233,7 @@ urlpatterns = [
     path('reporting-page/', ReportingPage.as_view(), name='reporting-page'),
     path(r'^reporting/search/', reporting, name='reporting'),
     
+    path('mini-reporting-page/', MiniReportingPage.as_view(), name='mini-reporting-page'),
+    path(r'^mini-reporting/search/', mini_reporting, name='mini-reporting'),
     
 ]

@@ -69,7 +69,8 @@
   </div>
   <label style="font-weight : bold;"> Nombre de Colis :</label> {{total_packages}} <br>
   <label style="font-weight : bold;"> Poids Total Produit (Selon Normes):</label> {{total_weight|floatformat:1}} Kg <br>
-  <label style="font-weight : bold;"> Poids Total Produit (Physique):</label> {{real_total_weight}} Kg
+  <label style="font-weight : bold;"> Poids Total Produit (Physique):</label> {{real_total_weight}} Kg <br>
+  <label style="font-weight : bold;"> Chiffre d'Affaire:</label> {{total_amount|floatformat:2}} DA
   <div class="table-responsive text-nowrap">
     <table class="table table-hover">
       <thead class="black white-text">
@@ -90,7 +91,7 @@
         {% for production in object_list %}
         <tr>
             <td>{{ production.date }}</td>
-            <td>{{production.user.first_name}} {{production.user.last_name}}</td>
+            <td>{{production.user.first_name}} {{production.user.last_name}}<br>{% if production.user2 is not None%} {{production.user2.first_name}} {{production.user2.last_name}} {% endif %}<br>{% if production.user3 is not None%} {{production.user3.first_name}} {{production.user3.last_name}} {% endif %}</td>
             {% comment %} <td><a href = "{% url 'stock-manager:invoice' production.slug %}" target ="_blank">{{production.slug}}</a></td> {% endcomment %}
             <td><a href="{% url 'production:update-production' production.slug %}">{{production.ref_code}}</a></td>
             <td>{{production.product|upper}}</td>
@@ -98,7 +99,7 @@
             <td>{{production.quantity_produced}}</td>
             <td>{{production.weight}}</td>
             <td>{{production.ideal_weight}}</td>
-            <td>{% if production.calculated_weight_difference > 0 %} <p style = "color:red;">{{ production.calculated_weight_difference }}</p> {% else %}<p style = "color:green;">{{ production.calculated_weight_difference }}</p> {% endif %} </td>
+            <td>{% if production.calculated_weight_difference > 0 %} <p style = "color:green;">{{ production.calculated_weight_difference }}</p> {% else %}<p style = "color:red;">{{ production.calculated_weight_difference }}</p> {% endif %} </td>
             <td>{{production.get_state_display}}</td>
         </tr>
         {% empty %}

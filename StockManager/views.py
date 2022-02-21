@@ -411,7 +411,7 @@ def final_product_entry(request):
         production = get_object_or_404(Production, slug = production_slug)
         if production.state == "PENDING":
             production.state = "FINISHED"
-            production.weight = weight
+            production.weight = weight - (Decimal(production.product.package.weight)*(Decimal(quantity)/1000))
             production.ideal_weight = (production.quantity_produced * production.product.weight * production.product.roll_package )/1000
             production.save()
             product = production.product

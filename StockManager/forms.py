@@ -23,7 +23,7 @@ class ContactChoiceForm(forms.ModelForm):
         ))
     intern_user = forms.ModelChoiceField(
         required=False,
-        queryset=User.objects.filter(profile__job_position__name ="Mélangeur") | User.objects.filter(profile__job_position__name ="Opérateur Façonnage"),
+        queryset=User.objects.filter(profile__job_position__name ="Mélangeur") | User.objects.filter(profile__job_position__name ="Opérateur Impression"),
         label="Opérateur",
         widget=forms.Select(
             attrs={

@@ -270,12 +270,13 @@ class CoilTypeForm(forms.ModelForm):
             'ref',
             'capacity',
             'micronnage_ideal',
+            'longueur',
             'quantity',
+            'price',
             'type_name',
             'warehouse',
             'brand',
             'color',
-            'the_print',
             'perfume',
             'flavor',
             'width',
@@ -305,13 +306,6 @@ class CoilTypeForm(forms.ModelForm):
                 "class": "form-control",
             }
         ))
-    the_print = forms.CharField(label="Impression",
-                           widget=forms.Select(
-                               choices=PRINT_CHOICES,
-                               attrs={
-                                   "class": "form-control",
-                               }
-                           ))
     perfume = forms.CharField(label="Parfum",
                            widget=forms.Select(
                                choices=PERFUMED,
@@ -328,6 +322,24 @@ class CoilTypeForm(forms.ModelForm):
                                       }
                                   ))
     micronnage_ideal = forms.FloatField(label="Micronnage idéal",
+                                  required=False,
+                                  widget=forms.TextInput(
+                                      attrs={
+                                          "class": "form-control",
+                                          "type": "number",
+                                          "step":"0.1",
+                                      }
+                                  ))
+    price = forms.FloatField(label="Prix/Kg",
+                                  required=False,
+                                  widget=forms.TextInput(
+                                      attrs={
+                                          "class": "form-control",
+                                          "type": "number",
+                                          "step":"0.01",
+                                      }
+                                  ))
+    longueur = forms.FloatField(label="Longueur Micronnage",
                                   required=False,
                                   widget=forms.TextInput(
                                       attrs={
@@ -598,7 +610,7 @@ class LabellingForm(forms.ModelForm):
 class PackageForm(forms.ModelForm):
     class Meta:
         model = Package
-        fields = ['name','capacity','the_print','perfume' ]
+        fields = ['name','capacity','the_print','perfume', 'weight' ]
     name = forms.ModelChoiceField(
         queryset=Range.objects.all(),
         widget=forms.Select(
@@ -633,6 +645,14 @@ class PackageForm(forms.ModelForm):
                 "class": "form-control",
             }
         ))
+    weight = forms.IntegerField(label="Poids",
+                                  required=True,
+                                  widget=forms.TextInput(
+                                      attrs={
+                                          "class": "form-control",
+                                          "type": "number",
+                                      }
+                                  ))
     def clean(self):
         cleaned_data = super().clean()
         return self.cleaned_data

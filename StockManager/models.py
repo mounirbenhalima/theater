@@ -209,6 +209,28 @@ class Order(models.Model):
             for item in self.parts.all():
                 total += item.quantity
         return total
+    
+    def get_amount(self):
+        total = 0
+        if self.category == "Matière Première" or self.category == "Produit Fini":
+            for item in self.items.all():
+                total += item.quantity * item.item.price
+        elif self.category == "Cordon":
+            for item in self.handles.all():
+                total += item.quantity * item.item.price
+        elif self.category == "Labelling":
+            for item in self.labellings.all():
+                total += item.quantity * item.item.price
+        elif self.category == "Emballage":
+            for item in self.packages.all():
+                total += item.quantity * item.item.price
+        elif self.category == "Scotch":
+            for item in self.tapes.all():
+                total += item.quantity * item.item.price
+        elif self.category == "Pièce de Rechange":
+            for item in self.parts.all():
+                total += item.quantity * item.item.price
+        return total
 
     def get_absolute_url(self):
         return reverse("stock-manager:order-detail", kwargs={"slug": self.slug})

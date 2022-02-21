@@ -12,7 +12,7 @@
       <thead class="black white-text">
       <a href="{% url 'production:finishedproduct' %}" class="btn btn-outline-dark col-sm-2 float-right">Nouveau</a>
         <tr>
-          <th style="width:5%">#</th>
+          <th style="width:5%">Opérateurs</th>
           <th style="width:25%">Référence</th>
           <th style="width:25%">Machine</th>
           <th style="width:25%">Produit</th>
@@ -25,7 +25,7 @@
         <tr>
           <form method="POST">
             {% csrf_token %}
-            <th scope="row">{{ forloop.counter }}</th>
+            <td>{{production.user}}<br>{% if production.user2 is not None%} {{production.user2}} {% endif %}<br>{% if production.user3 is not None%} {{production.user3}} {% endif %}</td>
             <td>{{production|upper}}</td>
             <td>{{production.machine|upper}}</td>
             <td>{{production.product.product_designation|upper}}</td>

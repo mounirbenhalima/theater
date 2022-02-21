@@ -302,7 +302,11 @@ def filter_finished_product(request):
 
     if is_valid_queryparam(id_user):
         qs = qs.filter(Q(user__first_name__icontains=id_user)
-                       | Q(user__last_name__icontains=id_user))
+                       | Q(user__last_name__icontains=id_user)
+                       | Q(user2__first_name__icontains=id_user)
+                       | Q(user2__last_name__icontains=id_user)
+                       | Q(user3__first_name__icontains=id_user)
+                       | Q(user3__last_name__icontains=id_user))
 
     if is_valid_queryparam(id_machine):
         qs = qs.filter(Q(machine__name__icontains=id_machine))
@@ -1081,15 +1085,20 @@ class ConsultingFinishedProductListView(ListView):
         total_weight = 0
         total_packages = 0
         real_total_weight = 0
-        for p in qs:    
-            total_weight += p.quantity_produced * p.product.weight * p.product.roll_package / 1000
+        total_amount = 0
+        for p in qs:
+            if p.state =="FINISHED" :
+                total_weight += p.quantity_produced * p.product.weight * p.product.roll_package / 1000
             real_total_weight += p.weight
             total_packages += p.quantity_produced
+            total_amount += float(p.quantity_produced) * float(p.product.roll_package) * float(p.product.price)
+
         context = {
             'object_list': qs,
             'total_weight': total_weight,
             'real_total_weight': real_total_weight,
             'total_packages': total_packages,
+            'total_amount': total_amount,
         }
         return render(self.request, 'production/finished_product_consulting.html', context)
 
@@ -1403,6 +1412,12 @@ class ReportingPage(View):
     def get(self, request):
         return render(request, "production/reporting_page.html")
 
+class MiniReportingPage(View):
+    template_name = 'production/mini_reporting_page.html'
+
+    def get(self, request):
+        return render(request, "production/mini_reporting_page.html")
+
 
 def reporting(request):
     current_time = None
@@ -1420,7 +1435,7 @@ def reporting(request):
 
         company = Company.objects.filter(name ="Ln Plast")[0]
         ####################### Pointage #######################
-
+    
         products = FinishedProductType.objects.all()
         for i in range(products.__len__()):
             products[i].calculated_quantity_produced = products[i].quantity_produced(start_date, end_date)
@@ -1555,19 +1570,7 @@ def reporting(request):
             users[i].calculated_shaping_number = users[i].shaping_number(start_date, end_date)
             users[i].calculated_shaping_weight = users[i].shaping_weight(start_date, end_date)
 
-            users[i].calculated_production_number = users[i].production_number(start_date, end_date)
-            users[i].calculated_production_weight = users[i].production_weight(start_date, end_date)
             
-            users[i].calculated_trash_weight = users[i].trash_weight(start_date, end_date)
-
-            users[i].calculated_defective_number = users[i].defective_number(start_date, end_date)
-            users[i].calculated_defective_weight = users[i].defective_weight(start_date, end_date)
-
-            users[i].calculated_quarantine_number = users[i].quarantine_number(start_date, end_date)
-            users[i].calculated_quarantine_weight = users[i].quarantine_weight(start_date, end_date)
-
-            users[i].calculated_destroy_number = users[i].destroy_number(start_date, end_date)
-            users[i].calculated_destroy_weight = users[i].destroy_weight(start_date, end_date)
         
         suppliers = Contact.objects.filter(contact_type="SUPPLIER")
         for i in range(suppliers.__len__()):
@@ -1727,6 +1730,106 @@ def reporting(request):
             return response
         return HttpResponse("Not found")
 
+def mini_reporting(request):
+    current_time = None
+    if request.method == "GET":
+        
+        from_date = request.GET.get("from")
+        to_date = request.GET.get("to")
+        start_date = parse_date(from_date)
+        end_date = parse_date(to_date)
+        start_date = datetime.combine(start_date, datetime.min.time())
+        end_date = datetime.combine(end_date, datetime.min.time())
+
+        start_date = start_date.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+        end_date = end_date.replace(hour = 23, minute = 59, second = 59, microsecond = 0)
+
+        company = Company.objects.filter(name ="Ln Plast")[0]
+        ####################### Pointage #######################
+
+        mixings = Order.objects.exclude(machine=None).all()
+        mixings = mixings.filter(ordered_date__gte = start_date)
+        mixings = mixings.filter(ordered_date__lte = end_date)
+
+        total_mixing_weight = 0
+        total_mixing_amount = 0
+        for i in mixings:
+            total_mixing_weight += i.get_total()
+            total_mixing_amount += i.get_amount()
+
+        coils = CoilType.objects.all()
+        for i in range(coils.__len__()):
+            coils[i].calculated_quantity_produced = coils[i].quantity_produced(start_date, end_date)
+            coils[i].calculated_weight_produced = coils[i].weight_produced(start_date, end_date)
+            coils[i].calculated_amount_produced = coils[i].amount_produced(start_date, end_date)
+        
+        coilss = Coil.objects.all()
+        coilss = coilss.filter(creation_date__gte = start_date)
+        coilss = coilss.filter(creation_date__lte = end_date)
+        total_coil_weight = 0
+        total_amount_produced = 0
+        total_coil_number = coilss.count()
+        for i in coilss:
+            total_amount_produced += i.weight * Decimal(i.type_coil.price)
+            total_coil_weight += i.weight
+
+        products = FinishedProductType.objects.all()
+        for i in range(products.__len__()):
+            products[i].calculated_quantity_produced = products[i].quantity_produced(start_date, end_date)
+            products[i].calculated_weight_produced = products[i].weight_produced(start_date, end_date)
+            products[i].calculated_amount_produced = products[i].amount_produced(start_date, end_date)
+
+        productions = Production.objects.filter(process_type = "FINISHED_PRODUCT")
+        productions = productions.filter(date__gte = start_date)
+        productions = productions.filter(date__lte = end_date)
+
+        total_product_number = 0
+        total_product_weight = 0
+        total_product_amount = 0
+        for p in productions:
+            total_product_number += p.quantity_produced
+            total_product_weight += p.weight
+            total_product_amount += p.quantity_produced * Decimal(p.product.price) * Decimal(p.product.roll_package)
+
+        trashes = Trash.objects.all()
+        trashes = trashes.filter(date__gte = start_date)
+        trashes = trashes.filter(date__lte = end_date)
+
+        total_trash = 0
+        for t in trashes:
+            total_trash += t.weight
+
+        template = loader.get_template('production/mini_reporting.html')
+        context = {
+            "start_date": start_date,
+            "end_date": end_date,
+            "mixings": mixings,
+            "total_mixing_weight":total_mixing_weight,
+            "total_mixing_amount":total_mixing_amount,
+            "total_coil_weight":total_coil_weight,
+            "total_coil_number":total_coil_number,
+            "total_amount_produced":total_amount_produced,
+            "total_product_number":total_product_number,
+            "total_product_weight":total_product_weight,
+            "total_product_amount":total_product_amount,
+            "total_trash":total_trash,
+            "coils":coils,
+            "products":products,
+            "trashes":trashes,
+            "company": company,
+        }
+        html = template.render(context)
+        pdf = render_to_pdf('production/mini_reporting.html', context)
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "rapport de production_%s.pdf" % (timezone.now())
+            content = "inline; filename='%s'" % (filename)
+            download = request.GET.get("download")
+            if download:
+                content = "attachment; filename='%s'" % (filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
 
 class PointPage(View):
     template_name = 'production/point_page.html'
@@ -2602,7 +2705,7 @@ class ExtrusionCreateView(View):
                 ref = get_random_string(15)
                 
                 coil = Coil(user=user, type_coil = product , extrusion_machine = extrusion.machine, ref=ref, creation_date=timezone.now(), name=product.name, quantity=1, type_name=product.type_name, capacity=product.capacity,
-                                perfume=product.perfume, the_print=product.the_print, brand=product.brand, color=product.color, warehouse=product.warehouse, printed="NOT_PRINTED")
+                                perfume=product.perfume, brand=product.brand, color=product.color, warehouse=product.warehouse, printed="NOT_PRINTED")
                 coil.save()
                 extrusion.coil = coil
                 mchn = Machine.objects.get(slug=machine.slug)
@@ -2871,16 +2974,6 @@ def shaping_coil_list(request):
                 return render(request, 'production/shaping_coil_list.html', context={'object_list': Coil.objects.filter(status="PENDING_SHAPING")})
 
         if coil.cw1 != 0 and coil.cw2 != 0 and coil.cw3 != 0:
-            try:
-                tr = Decimal(request.POST.get("trash"))
-            except:
-                messages.error(request, "Veuillez Remplir Le Déchet Généré.")
-                return render(request, 'production/shaping_coil_list.html', context={'object_list': Coil.objects.filter(shaper = request.user , status="PENDING_SHAPING")})
-            if tr == 0:
-                messages.error(request, "Veuillez Remplir Le Déchet Généré.")
-                return render(request, 'production/shaping_coil_list.html', context={'object_list': Coil.objects.filter(shaper = request.user , status="PENDING_SHAPING")})
-            coil.trash = tr
-
             coil.status = "CONSUMED"
             production = Production.objects.get(
                 coil=coil, process_type="SHAPING", state="PENDING")
@@ -2890,10 +2983,6 @@ def shaping_coil_list(request):
             mchn.save()
             coil.save()
             production.save()
-            ref = get_random_string(15)
-            company = Company.objects.get(name="Ln Plast")
-            trash = Trash(ref=ref, date=timezone.now(), user=production.user, weight=tr, machine=mchn, trash_type=coil.type_coil.type_name, whereabouts=company, state="PENDING")
-            trash.save()
         if cw != 0:
             if coil.cw1 is None or coil.cw1 == 0:
                 coil.cw1 = cw/1000
@@ -3311,9 +3400,7 @@ class ShapingCreateView(View):
 
     def get(self, request, *arg, **kwargs):
         form = ShapingForm()
-        users = User.objects.exclude(username = request.user.username ).filter(profile__job_position__name = "Opérateur Façonnage")
         context = {
-            'users':users,
             'form': form,
         }
         return render(self.request, 'production/shaping.html', context)
@@ -3326,40 +3413,121 @@ class ShapingCreateView(View):
                 coil = None
                 form = form.save(commit=False)
                 product = request.POST.get('_ref')
-                user = request.POST.get('user')
-                user_id = request.POST.get('user-id')
-                user_find = User.objects.get(username = user)
-                try:
-                    user_find2 = User.objects.get(username = user_id)
-                except:
-                    user_find2 = None
-                if user_find==user_find2:
-                    user = user_find
-                else:
-                    messages.error(request, "Opérateur Erroné")
-                    return redirect(reverse_lazy("production:shaping-process"))
+                product2 = request.POST.get('_ref2')
+                product3 = request.POST.get('_ref3')
+                product4 = request.POST.get('_ref4')
+                product5 = request.POST.get('_ref5')
+                product6 = request.POST.get('_ref6')
+                user = form.user
                 try:
                     coil = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product)
                     coil_type = coil.type_coil
-                except Coil.DoesNotExist:
+                except:
                     coil = None
+                
+                try:
+                    coil2 = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product2)
+                    coil_type2 = coil2.type_coil
+                except:
+                    coil2 = None
+                
+                try:
+                    coil3 = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product3)
+                    coil_type3 = coil3.type_coil
+                except:
+                    coil3 = None
+                
+                try:
+                    coil4 = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product4)
+                    coil_type4 = coil4.type_coil
+                except:
+                    coil4 = None
+
+                try:
+                    coil5 = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product5)
+                    coil_type5 = coil5.type_coil
+                except:
+                    coil5 = None
+
+                try:
+                    coil6 = Coil.objects.exclude(status ="TO_BE_DESTROYED").exclude(status ="CONSUMED").exclude(status ="SOLD").exclude(status ="CUT").exclude(status ="PENDING_EXTRUSION").exclude(status ="PENDING_PRINTING").exclude(status ="PENDING_SHAPING").get(ref__icontains=product6)
+                    coil_type6 = coil6.type_coil
+                except:
+                    coil6 = None
+
                 if coil != None:
                     machine = form.machine
                     shaping = Production(date=timezone.now(),coil = coil, user=user, coil_type = coil_type ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
                     mchn = Machine.objects.get(slug=machine.slug)
                     mchn.state = "OCCUPIED"
                     coil.status = "PENDING_SHAPING"
-                    coil.shaper = request.user
+                    coil.shaper = shaping.user
                     coil.shaping_date = shaping.date
                     coil.shaping_machine = shaping.machine
                     coil.save()
                     mchn.save()
                     shaping.save()
-                    return redirect(self.success_url)
-                else:
-                    messages.error(
-                        request, "Référence Inexistante")
-                    return redirect(reverse_lazy("production:shaping-process"))
+                if coil2 != None:
+                    machine = form.machine
+                    shaping = Production(date=timezone.now(),coil = coil2, user=user, coil_type = coil_type2 ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
+                    mchn = Machine.objects.get(slug=machine.slug)
+                    mchn.state = "OCCUPIED"
+                    coil2.status = "PENDING_SHAPING"
+                    coil2.shaper = shaping.user
+                    coil2.shaping_date = shaping.date
+                    coil2.shaping_machine = shaping.machine
+                    coil2.save()
+                    mchn.save()
+                    shaping.save()
+                if coil3 != None:
+                    machine = form.machine
+                    shaping = Production(date=timezone.now(),coil = coil3, user=user, coil_type = coil_type3 ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
+                    mchn = Machine.objects.get(slug=machine.slug)
+                    mchn.state = "OCCUPIED"
+                    coil3.status = "PENDING_SHAPING"
+                    coil3.shaper = shaping.user
+                    coil3.shaping_date = shaping.date
+                    coil3.shaping_machine = shaping.machine
+                    coil3.save()
+                    mchn.save()
+                    shaping.save()
+                if coil4 != None:
+                    machine = form.machine
+                    shaping = Production(date=timezone.now(),coil = coil4, user=user, coil_type = coil_type4 ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
+                    mchn = Machine.objects.get(slug=machine.slug)
+                    mchn.state = "OCCUPIED"
+                    coil4.status = "PENDING_SHAPING"
+                    coil4.shaper = shaping.user
+                    coil4.shaping_date = shaping.date
+                    coil4.shaping_machine = shaping.machine
+                    coil4.save()
+                    mchn.save()
+                    shaping.save()
+                if coil5 != None:
+                    machine = form.machine
+                    shaping = Production(date=timezone.now(),coil = coil5, user=user, coil_type = coil_type5 ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
+                    mchn = Machine.objects.get(slug=machine.slug)
+                    mchn.state = "OCCUPIED"
+                    coil5.status = "PENDING_SHAPING"
+                    coil5.shaper = shaping.user
+                    coil5.shaping_date = shaping.date
+                    coil5.shaping_machine = shaping.machine
+                    coil5.save()
+                    mchn.save()
+                    shaping.save()
+                if coil6 != None:
+                    machine = form.machine
+                    shaping = Production(date=timezone.now(),coil = coil6, user=user, coil_type = coil_type6 ,quantity_produced=1, machine=machine, process_type="SHAPING", state="PENDING")
+                    mchn = Machine.objects.get(slug=machine.slug)
+                    mchn.state = "OCCUPIED"
+                    coil6.status = "PENDING_SHAPING"
+                    coil6.shaper = shaping.user
+                    coil6.shaping_date = shaping.date
+                    coil6.shaping_machine = shaping.machine
+                    coil6.save()
+                    mchn.save()
+                    shaping.save()
+                return redirect(self.success_url)
 
 class HandleConsumptionView(View):
     model = HandleConsumption
@@ -3472,6 +3640,7 @@ class PrintingCreateView(View):
                     #     coil.type_coil = typeofcoil
                     #     coil.save()
                     machine = form.machine
+                    the_print = form.the_print
                     user = request.user
                     coil_type = coil.type_coil
                     printing = Production(date=timezone.now(), coil = coil, user=user, coil_type=coil_type, quantity_produced=1, machine=machine, process_type="PRINTING", state="PENDING")
@@ -3481,6 +3650,7 @@ class PrintingCreateView(View):
                     coil.printer = request.user
                     coil.printing_date = printing.date
                     coil.printing_machine = printing.machine
+                    coil.the_print = the_print
                     coil.save()
                     mchn.save()
                     printing.save()
@@ -3498,10 +3668,8 @@ class FinishedProductCreateView(View):
 
     def get(self, request, *arg, **kwargs):
         form = FinishedProductForm()
-        users = User.objects.exclude(username = request.user.username ).filter(profile__job_position__name = "Opérateur Façonnage")
         context = {
             'form': form,
-            'users':users,
             'ranges':Range.objects.all(),
             'colors':Color.objects.all(),
             'flavors':Flavor.objects.all(),
@@ -3514,19 +3682,6 @@ class FinishedProductCreateView(View):
         if self.request.method == "POST":
             if form.is_valid():
                 form = form.save(commit=False)
-                user = request.POST.get('user')
-                user_id = request.POST.get('user-id')
-                user_find = User.objects.get(username = user)
-                try:
-                    user_find2 = User.objects.get(username = user_id)
-                except:
-                    user_find2 = None
-                if user_find==user_find2:
-                    user = user_find
-                else:
-                    messages.error(request, "Opérateur Erroné")
-                    return redirect(reverse_lazy("production:shaping-process"))
-
                 # product_range = request.POST.get("range")
                 # product_capacity = request.POST.get("capacity")
                 # try:
@@ -3546,16 +3701,13 @@ class FinishedProductCreateView(View):
                 # except:
                 #     messages.error(request, "Produit Introuvable")
                 #     return redirect(request.META.get('HTTP_REFERER'))
-
+                user = form.user
+                user2 = form.user2
+                user3 = form.user3
                 product = form.product
-                
-                # if product != product_confirmation :
-                #     messages.error(request, "Produit Incohérents")
-                #     return redirect(request.META.get('HTTP_REFERER'))
-                    
                 machine = form.machine
                 quantity = form.quantity_produced
-                production = Production(date=timezone.now(), user=user, product=product, quantity_produced=quantity,
+                production = Production(date=timezone.now(), user=user, user2 = user2, user3 = user3, product=product, quantity_produced=quantity,
                                         machine=machine, process_type="FINISHED_PRODUCT", state="PENDING")
                 production.save()
                 return redirect(self.success_url)
@@ -3609,51 +3761,19 @@ def printing_coil_list(request):
     if request.method == "POST":
         coil_slug = request.POST.get("get_coil")
         coil = get_object_or_404(Coil, slug=coil_slug)
-        try:
-            weight = Decimal(request.POST.get("weight"))
-        except:
-            messages.error(request, "Veuillez entrer le poids de la bobine")
-            return render(request, 'production/printing_coil_list.html', context={'object_list': coils })
+        micronnage_print = request.POST.get("micronnage")
+        production = Production.objects.get(process_type="PRINTING",coil=coil, state="PENDING")
+        production.state = "FINISHED"
+        production.save()
+        coil.status = "IN_STOCK"
+        coil.printed = "PRINTED"
+        coil.micronnage_print = micronnage_print
+        coil.save()
+        mchn = Machine.objects.get(slug=production.machine.slug)
+        mchn.state = "FREE"
+        mchn.save()
+        return render(request, 'production/printing_coil_list.html', context={'object_list': coils })
 
-        if weight == 0:
-            messages.error(request, "Veuillez entrer le poids de la bobine")
-            return render(request, 'production/printing_coil_list.html', context={'object_list': coils })
-        elif weight > coil.weight:
-            messages.error(request, "Poids erroné !")
-            return render(request, 'production/printing_coil_list.html', context={'object_list': coils })
-        elif weight == coil.weight:
-            production = Production.objects.get(process_type="PRINTING",coil=coil, state="PENDING")
-            production.state = "FINISHED"
-            production.save()
-            coil.status = "IN_STOCK"
-            coil.printed = "PRINTED"
-            coil.save()
-            mchn = Machine.objects.get(slug=production.machine.slug)
-            mchn.state = "FREE"
-            mchn.save()
-            return render(request, 'production/printing_coil_list.html', context={'object_list': coils })
-
-        else:
-            production = Production.objects.get(process_type="PRINTING", coil=coil, state="PENDING")
-            production.state = "FINISHED"
-            coil.status = "CUT"
-            sub_ref1 = get_random_string(15)
-            sub_ref2 = get_random_string(15)
-            rest_weight = coil.weight - weight 
-            sub_coil1 = Coil(user=coil.user,introducer=coil.introducer,weight = weight ,type_coil = coil.type_coil, extrusion_machine = coil.extrusion_machine, printing_machine= coil.printing_machine, printer= coil.printer , printing_date = coil.printing_date , ref=sub_ref1, parent=coil, is_sub=True, creation_date=timezone.now(), name=coil.name, quantity=1, type_name=coil.type_name,
-                             capacity=coil.capacity, micronnage = coil.micronnage, perfume=coil.perfume, the_print=coil.the_print, brand=coil.brand, color=coil.color, warehouse=coil.warehouse, status="IN_STOCK", printed="PRINTED")
-            sub_coil2 = Coil(user=coil.user,introducer = coil.introducer,weight = rest_weight, type_coil = coil.type_coil, extrusion_machine = coil.extrusion_machine, printing_machine= coil.printing_machine,printer= coil.printer, printing_date = coil.printing_date, ref=sub_ref2, parent=coil, is_sub=True, creation_date=timezone.now(), name=coil.name, quantity=1, type_name=coil.type_name,
-                             capacity=coil.capacity,micronnage = coil.micronnage, perfume=coil.perfume, the_print=coil.the_print, brand=coil.brand, color=coil.color, warehouse=coil.warehouse, status="PENDING_PRINTING", printed="NOT_PRINTED")
-            coil.save()
-            sub_coil1.save()
-            sub_coil2.save()
-            production.save()
-            coil_type = coil.type_coil
-            coil_type.save()
-            printing_done = Production(date=timezone.now(), coil = sub_coil1, user=production.user, coil_type=coil_type, quantity_produced=1, machine=production.machine, process_type="PRINTING", state="FINISHED")
-            printing_pending = Production(date=timezone.now(), coil = sub_coil2, user=production.user, coil_type=coil_type, quantity_produced=1, machine=production.machine, process_type="PRINTING", state="PENDING")
-            printing_done.save()
-            printing_pending.save()
     return render(request, 'production/printing_coil_list.html', context={'object_list': coils })
 
 class RecapPage(View):

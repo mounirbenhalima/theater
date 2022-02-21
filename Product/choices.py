@@ -31,11 +31,13 @@ PRINT_CHOICES = (
 
 SIZE = (
     (None,"---------"),
-    ("MINI","Mini"),
-    ("SMALL","Petit Modèle"),
-    ("MEDIUM","Moyen Modèle"),
-    ("BIG","Grand Modèle"),
-    ("GGM","Grand Modèle +"),
+    ("MINI","15 Mini"),
+    ("SMALL","19 Petit Modèle"),
+    ("MEDIUM","25 Moyen Modèle"),
+    ("MEDIUM","26 Moyen Modèle"),
+    ("BIG","30 Grand Modèle"),
+    ("KOROZO_BIG","39 Grand Modèle"),
+    ("GGM","42 Grand Modèle +"),
 )
 
 RANGE_CATEGORY = (

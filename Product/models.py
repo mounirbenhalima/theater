@@ -3,6 +3,7 @@ from django.urls import reverse
 from django.template.defaultfilters import slugify
 
 from django.db.models import Q
+from decimal import Decimal
 
 from django.core.validators import MinValueValidator
 from .choices import SIZE, RANGE_CATEGORY, TYPE_TRASH,TAPE_TYPE, PRINT_CHOICES, TYPE_PRODUCT, TYPE_PIECE, PERFUMED, COIL_STATUS, DEFECTIVE_CHOICES, PRINTED, TRASH_STATE, PACKAGE_TYPES
@@ -136,7 +137,7 @@ class Product(models.Model):
     quantity_workshop = models.IntegerField("Quantité dans l'atelier", default=0, blank=True, null=True)
     external_quantity = models.IntegerField("Stock Externe", default=0, blank=True, null=True)
     threshold = models.PositiveIntegerField("Seuil", default=0, blank=True, null=True)
-    price = models.FloatField('Prix', null=True, blank=True)
+    price = models.FloatField('Prix',default = 0, null=True, blank=True)
     type_name = models.CharField(max_length=250, choices=TYPE_PRODUCT, null=True, blank=True)
 
     perfume = models.CharField(max_length=250, blank=True, null=True, choices=PERFUMED)
@@ -358,6 +359,9 @@ class Coil(Product):
                             choices=PRINT_CHOICES, null=True, blank=True)
     micronnage = models.FloatField(
         verbose_name="Micronnage", default=0, blank=True, null=True)
+    
+    micronnage_print = models.FloatField(
+        verbose_name="Micronnage Impression", default=0, blank=True, null=True)
 
     extrusion_machine = models.ForeignKey('Machine.Machine', blank=True, null = True, on_delete = models.SET_NULL, related_name="extrudeuse")
     printing_machine = models.ForeignKey('Machine.Machine', blank=True, null = True, on_delete = models.SET_NULL, related_name="imprimeuse")
@@ -385,7 +389,6 @@ class Coil(Product):
     cw2 = models.DecimalField(default = 0, null=True, blank=True, decimal_places=3, max_digits=6)
     cw3 = models.DecimalField(default = 0, null=True, blank=True, decimal_places=3, max_digits=6)
     cwm = models.DecimalField(default = 0, null=True, blank=True, decimal_places=3, max_digits=6)
-    trash = models.DecimalField(default = 0, null=True, blank=True, decimal_places=1, max_digits=6)
 
     parent = models.ForeignKey("Coil",max_length=200, on_delete= models.SET_NULL,null=True, blank=True)
     is_sub = models.BooleanField("Dérivée", default=False, null=True, blank=True)
@@ -439,10 +442,10 @@ class Coil(Product):
 
 class CoilType(Product):
     capacity = models.CharField("Taille",max_length=255, choices=SIZE, blank=True, null=True)
-    the_print = models.CharField("Impression", max_length=250,
-                            choices=PRINT_CHOICES, null=True, blank=True)
     micronnage_ideal = models.FloatField(
         verbose_name="Micronnage", default=0, blank=True, null=True)
+    longueur = models.FloatField(
+        verbose_name="Longueur Micronnage", default=0, blank=True, null=True)
     height = models.FloatField(null=True, blank=True)
     width = models.FloatField(null=True, blank=True)
     def get_absolute_url(self):
@@ -450,12 +453,12 @@ class CoilType(Product):
 
     def save(self, *args, **kwargs):
         get_name = self.name.name if self.name is not None else ''
-        get_print = self.get_the_print_display() if self.the_print != None else ""
         get_capacity = self.get_capacity_display() if self.capacity != None else ""
         get_color = self.color if self.color != None else ""
         get_perfumed = self.get_perfume_display() if self.perfume is not None else ''
         get_flavor = self.flavor if self.flavor is not None else ""
-        slug_coiltype = f"coiltype-{get_name}-{get_capacity}l-{get_color}-{get_print}-{get_perfumed}-{get_flavor}"
+        get_micronnage_ideal = self.micronnage_ideal if self.micronnage_ideal is not None else ''
+        slug_coiltype = f"coiltype-{get_name}-{get_capacity}l-{get_color}-{get_perfumed}-{get_flavor}-{get_micronnage_ideal}"
         # if self.slug is None:
         self.slug = slugify(slug_coiltype)
         self.product_designation = f"Bobine {self.__str__().upper()}"
@@ -463,15 +466,16 @@ class CoilType(Product):
 
     def __str__(self):
         get_name = self.name.name if self.name is not None else ''
-        get_print = self.get_the_print_display() if self.the_print != None else ""
         get_capacity = self.get_capacity_display() if self.capacity != None else ""
         get_color = self.color if self.color is not None else ""
+        get_micronnage_ideal = self.micronnage_ideal if self.micronnage_ideal != None else ""
+        get_longueur = self.longueur if self.longueur is not None else ""
         get_perfumed = self.get_perfume_display() if self.perfume == "PERFUMED" else ''
         get_flavor = self.flavor if self.flavor is not None else ""
         if self.flavor is not None:
-            return f"{get_name} {get_capacity} {get_color} ({get_print}) [{get_perfumed} {get_flavor}]"
+            return f"{get_name} {get_capacity} {get_color} ({get_longueur}-{get_micronnage_ideal}) [{get_perfumed} {get_flavor}]"
         else:
-            return f"{get_name} {get_capacity} {get_color} ({get_print}) {get_perfumed}"
+            return f"{get_name} {get_capacity} {get_color} ({get_longueur}-{get_micronnage_ideal}) {get_perfumed}"
 
     def quantity_produced(self, start_date, end_date):
         coils = self.coil_set.exclude(status = "CUT").filter(Q(creation_date__lte = end_date) & Q(creation_date__gte = start_date))
@@ -487,6 +491,17 @@ class CoilType(Product):
             total += p.weight
         
         return total
+    
+    def amount_produced(self, start_date, end_date):
+        coils = self.coil_set.exclude(status = "CUT").filter(Q(creation_date__lte = end_date) & Q(creation_date__gte = start_date))
+        total = 0
+        amount = 0
+        for p in coils:
+            total += p.weight
+        
+        amount = total * Decimal(self.price)
+        
+        return amount
 
     def quantity_shaped(self, start_date, end_date):
         coils = self.coil_set.filter(Q(shaping_date__lte = end_date) & Q(shaping_date__gte = start_date) & Q(status = "CONSUMED"))
@@ -519,7 +534,7 @@ class CoilType(Product):
         return total
 
     class Meta:
-        ordering = ['name', 'capacity']
+        ordering = ['capacity','name']
 
 class FinishedProduct(Product):
     capacity = models.CharField("Taille",max_length=255, choices=SIZE, blank=True, null=True)
@@ -617,6 +632,25 @@ class FinishedProductType(Product):
                 total += p.quantity_produced
         
         return total
+    
+    def weight_produced(self, start_date, end_date):
+        productions = self.ProduitCible.filter(Q(date__lte = end_date) & Q(date__gte = start_date))
+        total = 0
+        for p in productions:
+            if p.weight is not None:
+                total += p.weight
+        
+        return total
+    
+    def amount_produced(self, start_date, end_date):
+        productions = self.ProduitCible.filter(Q(date__lte = end_date) & Q(date__gte = start_date))
+        total = 0
+        amount = 0
+        for p in productions:
+            if p.weight is not None:
+                total += p.weight
+        amount = total * Decimal(self.price)
+        return amount
     
     def user_quantity_produced(self, start_date, end_date, user):
         productions = self.ProduitCible.filter(Q(user = user) & Q(date__lte = end_date) & Q(date__gte = start_date))
@@ -850,6 +884,8 @@ class Package(models.Model):
     perfume = models.CharField(max_length=250, blank=True, null=True, choices=PERFUMED)
     quantity = models.PositiveIntegerField(
         "Quantité", default=0, blank=True, null=True, validators=[MinValueValidator(0)])
+    weight = models.PositiveIntegerField(
+        "Poids", default=0, blank=True, null=True, validators=[MinValueValidator(0)])
     threshold = models.PositiveIntegerField(
         "Seuil", default=0, blank=True, null=True)
     quantity_workshop = models.PositiveIntegerField(

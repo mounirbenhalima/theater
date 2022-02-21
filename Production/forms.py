@@ -1,6 +1,6 @@
 from django import forms
 from django.db.models import Q
-
+from django.contrib.auth.models import User
 from .models import Production
 from StockManager.models import Warehouse
 from Contact.models import Contact
@@ -307,8 +307,15 @@ class CoilDetailForm(forms.ModelForm):
 class ShapingForm(forms.ModelForm):
     class Meta:
         model = Production
-        fields = ['machine']
-
+        fields = ['machine','user']
+    user = forms.ModelChoiceField(
+        label="Opérateur",
+        queryset=User.objects.filter(profile__job_position__name = "Opérateur Façonnage"),
+        widget=forms.Select(
+            attrs={
+                "class": "form-control",
+            }
+        ))
     machine = forms.ModelChoiceField(
         label="Soudeuse",
         queryset=Machine.objects.filter(Q(machine_type__name="Soudeuse")),
@@ -326,7 +333,7 @@ class ShapingForm(forms.ModelForm):
 class PrintingForm(forms.ModelForm):
     class Meta:
         model = Production
-        fields = [ 'machine']
+        fields = [ 'machine', 'the_print']
 
     machine = forms.ModelChoiceField(
         label="Imprimeuse",
@@ -336,6 +343,13 @@ class PrintingForm(forms.ModelForm):
                 "class": "form-control",
             }
         ))
+    the_print = forms.CharField(label="Impression",
+                           widget=forms.Select(
+                               choices=PRINT_CHOICES,
+                               attrs={
+                                   "class": "form-control",
+                               }
+                           ))
 
     def clean(self):
         cleaned_data = super().clean()
@@ -344,8 +358,39 @@ class PrintingForm(forms.ModelForm):
 class FinishedProductForm(forms.ModelForm):
     class Meta:
         model = Production
-        fields = ['product', 'machine', 'quantity_produced']
-
+        fields = ['user', 'user2', 'user3', 'product', 'machine', 'quantity_produced']
+    user = forms.ModelChoiceField(
+        label="Opérateur 1",
+        queryset=User.objects.filter(profile__job_position__name = "Opérateur Façonnage"),
+        widget=forms.Select(
+            attrs={
+                "class": "form-control",
+            }
+        )
+        
+        )
+    user2 = forms.ModelChoiceField(
+        label="Opérateur 2",
+        required=False,
+        queryset=User.objects.filter(profile__job_position__name = "Opérateur Façonnage"),
+        widget=forms.Select(
+            attrs={
+                "class": "form-control",
+            }
+        )
+        
+        )
+    user3 = forms.ModelChoiceField(
+        label="Opérateur 3",
+        required=False,
+        queryset=User.objects.filter(profile__job_position__name = "Opérateur Façonnage"),
+        widget=forms.Select(
+            attrs={
+                "class": "form-control",
+            }
+        )
+        
+        )
     product = forms.ModelChoiceField(
         label="Produit",
         queryset=FinishedProductType.objects.all(),

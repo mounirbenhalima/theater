@@ -151,6 +151,7 @@
           <th style="width:5%">Extrudeuse</th>
           <th style="width:5%">Poids</th>
           <th style="width:5%">Micronnage</th>
+          <th style="width:5%">Micronnage Impression</th>
           <th style="width:5%">Impression</th>
           <th style="width:5%">Date Impression</th>
           <th style="width:5%">Opérateur Impression</th>
@@ -195,6 +196,7 @@
             <td>{% if coil.extrusion_machine is not None %} {{coil.extrusion_machine}} {% endif %}</td>
             <td>{{coil.weight}}</td>
             <td>{{coil.micronnage}}</td>
+            <td>{{coil.micronnage_print}}</td>
             
             <td>{% if coil.printed is not None %}{{coil.get_printed_display}}{% endif %}</td>
             

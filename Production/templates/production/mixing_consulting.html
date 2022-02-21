@@ -74,8 +74,8 @@
             <td>{{mixing.user.first_name}} {{mixing.user.last_name}}</td>
             {% comment %} <td><a href = "{% url 'stock-manager:invoice' production.slug %}" target ="_blank">{{production.slug}}</a></td> {% endcomment %}
             <td>{{mixing.ref_code}}</td>
-            <td>{% for item in mixing.items.all %}{{item.item.product_designation}}<br>{% endfor %}<p style = "font-weight: bold;">Total:</p></td>
-            <td>{% for item in mixing.items.all %}{{item.quantity}}<br>{% endfor %}<p style = "font-weight: bold;">{{ mixing.get_total }}</p></td>
+            <td>{% for item in mixing.items.all %}{{item.item.product_designation}}<br>{% endfor %}<p style = "font-weight: bold;">Total:</p><br><p style = "font-weight: bold;">Valeur:</p></td>
+            <td>{% for item in mixing.items.all %}{{item.quantity}}<br>{% endfor %}<p style = "font-weight: bold;">{{ mixing.get_total }}</p><br><p style = "font-weight: bold;">{{ mixing.get_amount }} DA</p></td>
             <td>{{mixing.machine}}</td>
             {% if request.user.profile.job_position.name == "Administrateur" %} <td><a class="btn btn-md btn-red" href= {{ mixing.get_delete_url }}>Supprimer</a></td>{% endif %}
         </tr>

@@ -5,12 +5,16 @@ from django.template.defaultfilters import slugify
 from django.contrib.auth.models import User
 from django.utils.crypto import get_random_string
 from .choices import PROCESS_TYPE, STATE_PRODUCTION, CONSUMED, CORRECTION_TYPE
-from Product.choices import TYPE_PRODUCT, PERFUMED
+from Product.choices import TYPE_PRODUCT, PERFUMED, PRINT_CHOICES
 
 
 class Production(models.Model):
     user = models.ForeignKey(
-        User, on_delete=models.SET_NULL, blank=True, null=True)
+        User, on_delete=models.SET_NULL, blank=True, null=True, related_name="first_production_user")
+    user2 = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True, related_name="second_production_user")
+    user3 = models.ForeignKey(
+        User, on_delete=models.SET_NULL, blank=True, null=True, related_name="third_production_user")
     slug = models.SlugField(unique=False, blank=True, null=True)
     ref_code = models.CharField(max_length=250, blank=True, null=True)
     date = models.DateTimeField()
@@ -38,6 +42,8 @@ class Production(models.Model):
     consumed = models.CharField(
         max_length=50, choices=CONSUMED, default="NOT_CONSUMED", blank=True, null=True)
     rectified = models.BooleanField("Rectifié", default=False, blank=True, null = True)
+    the_print = models.CharField("Impression", max_length=250,
+                            choices=PRINT_CHOICES, null=True, blank=True)
 
     def get_absolute_url(self):
         return reverse("production:", kwargs={"slug": self.slug})
@@ -64,7 +70,7 @@ class Production(models.Model):
         super(Production, self).save(*args, **kwargs)
 
     def weight_difference(self):
-        return self.weight - self.ideal_weight
+        return self.ideal_weight - self.weight
 
 
     class Meta:

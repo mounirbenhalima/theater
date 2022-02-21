@@ -1,18 +1,38 @@
 {% include "base/base.html" %} {% block content %}
-<div class="container my-5">
 
-    {% if request.user.profile.job_position.name != "Gérant" %}
+{% if request.user.profile.job_position.name == "Administrateur" %}
+<div class="container my-5">
     <!--Section: Content-->
     <section class="dark-grey-text text-center">
             {% comment %} <a class="btn" href="{% url 'production:reporting-page' %}">Générer Rapport</a> {% endcomment %}
         <!-- Section heading -->
-        <h1 class="font-weight-bold black-text mb-5 pb-2">Personnel</h1>
+        <h1 class="font-weight-bold black-text mb-5 pb-2">Analyse</h1>
 
         <!--First row-->
         <div class="row mt-1">
 
             <!--Grid column-->
-            <div class="col-md-6 mb-4">
+            <div class="col-md-4 mb-4">
+
+                <!-- Card -->
+                <a href="{% url 'production:mini-reporting-page' %}" class="card hoverable">
+
+                    <!-- Card content -->
+                    <div class="card-body my-4">
+
+                        <p><i class="fas fa-spinner fa-3x text-muted"></i></p>
+                        <h5 class="black-text mb-0">Rapport Simplifié</h5>
+
+                    </div>
+
+                </a>
+                <!-- Card -->
+
+            </div>
+            <!--Grid column-->
+
+            <!--Grid column-->
+            <div class="col-md-4 mb-4">
 
                 <!-- Card -->
                 <a href="{% url 'production:reporting-page' %}" class="card hoverable">
@@ -31,7 +51,7 @@
             </div>
             <!--Grid column-->
             <!--Grid column-->
-            <div class="col-md-6 mb-4">
+            <div class="col-md-4 mb-4">
 
                 <!-- Card -->
                 <a href="{% url 'production:admin-recap-page' %}" class="card hoverable">
@@ -49,6 +69,28 @@
 
             </div>
             <!--Grid column-->
+
+                       
+        <!-- Section heading -->
+        <hr class="mb-4">
+
+        <!--First row-->
+        <div class="row mt-4">
+
+<!--First row-->
+</section>
+
+</div>
+
+<div class="container my-5">
+
+
+    <!--Section: Content-->
+    <section class="dark-grey-text text-center">
+
+        <!-- Section heading -->
+        <h1 class="font-weight-bold black-text mb-5 pb-2">Personnel</h1>
+        <div class="row mt-4">
             <!--Grid column-->
             <div class="col-md-4 mb-4">
 
@@ -174,8 +216,6 @@
 </section>
 
 </div>
-
-{% endif %}
 
 <div class="container my-5">
 
@@ -816,5 +856,46 @@
 
 </div>
 
+
+{% elif request.user.profile.job_position.name == "Gérant" %}
+<div class="container my-5">
+    <!--Section: Content-->
+    <section class="dark-grey-text text-center">
+        <!-- Section heading -->
+
+        <!--First row-->
+        <div class="row mt-1">
+
+            <!--Grid column-->
+            <div class="col-md-12 mb-4">
+
+                <!-- Card -->
+                <a href="{% url 'production:mini-reporting-page' %}" class="card hoverable">
+
+                    <!-- Card content -->
+                    <div class="card-body my-4">
+
+                        <p><i class="fas fa-spinner fa-3x text-muted"></i></p>
+                        <h5 class="black-text mb-0">Rapport Simplifié</h5>
+
+                    </div>
+
+                </a>
+                <!-- Card -->
+
+            </div>
+            <!--Grid column-->
+            
+        <!-- Section heading -->
+        <hr class="mb-4">
+
+        <!--First row-->
+        <div class="row mt-4">
+
+<!--First row-->
+</section>
+
+</div>
+{% endif %}
 
 {% endblock content %}
