@@ -140,10 +140,6 @@ def ticket_sale(request, slug):
         company5 = Company.objects.get(name='Theater5')
     except:
         company5 = None
-    try:
-        company6 = Company.objects.get(name='Theater6')
-    except:
-        company6 = None
     context = {
         "ticket_sale": ticket_sale,
         "company":company,
@@ -151,7 +147,6 @@ def ticket_sale(request, slug):
         "company3":company3,
         "company4":company4,
         "company5":company5,
-        "company6":company6,
     }
     html = template.render(context)
     pdf = render_to_pdf('product/ticket.html', context)
