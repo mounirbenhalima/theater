@@ -1,3 +1,4 @@
+# To my beloved wife Imene
 import os
 from pathlib import Path
 from django.contrib.messages import constants as message_constants
@@ -44,13 +45,9 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'Production.apps.ProductionConfig',
     'Product.apps.ProductConfig',
     'Profile.apps.ProfileConfig',
-    'StockManager.apps.StockmanagerConfig',
     'Company.apps.CompanyConfig',
-    'Contact.apps.ContactConfig',
-    'Machine.apps.MachineConfig',
 ]
 
 MIDDLEWARE = [
@@ -91,7 +88,7 @@ WSGI_APPLICATION = 'LN.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql_psycopg2',
-        'NAME': 'lnplast',
+        'NAME': 'theater',
         'USER': 'postgres',
         'PASSWORD': 'Wendy123()=',
         'HOST': 'localhost',

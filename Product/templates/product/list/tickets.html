@@ -1,0 +1,30 @@
+{% include "base/base.html" %} {% block content %}
+
+{% if request.user.profile.job_position.name == "Administrateur" %}
+<div class="container my-5">
+    <!--Section: Content-->
+    <section class="dark-grey-text text-center">
+        <!--First row-->
+        <div class="row mt-1">
+            {% for ticket in tickets %}
+            <!--Grid column-->
+            <div class="col-md-4 mb-4">
+
+                <!-- Card -->
+                <a href="{% url 'product:ticket-sale' ticket.slug %}" class="card hoverable">
+
+                    <!-- Card content -->
+                    <div class="card-body my-4">
+
+                        <h1 class="black-text mb-0">{{ticket.price|floatformat:0}} DA</h5>
+
+                    </div>
+
+                </a>
+                <!-- Card -->
+
+            </div>
+            <!--Grid column-->
+            {% endfor %}
+{% endif %}
+{% endblock content %}

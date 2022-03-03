@@ -26,10 +26,6 @@ urlpatterns = [
                             login_url=reverse_lazy('login')), name="main-index"),
     # Custom Apps
     path('', include("Profile.urls")),
-    path('contact/', include("Contact.urls")),
-    path('machine/', include("Machine.urls")),
     path('product/', include("Product.urls")),
-    path('production/', include("Production.urls")),
-    path('stock-manager/', include("StockManager.urls")),
 
 ]

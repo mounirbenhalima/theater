@@ -1,4 +1,9 @@
 from django.contrib.auth.decorators import login_required
+from django.utils import timezone
+from django.utils.dateparse import parse_date
+from datetime import date
+from datetime import datetime
+from django.template import loader, Context
 from django.contrib import messages
 from django.http import HttpResponseForbidden
 from django.shortcuts import render, redirect, get_object_or_404
@@ -13,37 +18,33 @@ from django.views.generic import (
     DeleteView,
     ListView
 )
-from Product.models import Brand, Product, Color, Flavor, Coil, RawMatter, CoilType, FinishedProductType, Range, CombinedRange, Handle, Labelling, Package, Tape, SparePart
+from Product.models import Ticket, TicketSale
+from Company.models import Company
 
-from Product.forms import (
-    ColorForm,
-    FlavorForm,
-    RawMatterForm,
-    CoilTypeForm,
-    FinalProductForm,
-    HandleForm,
-    LabellingForm,
-    PackageForm,
-    TapeForm,
-    SparePartForm,
-    BrandForm,
-    RangeForm,
-    CombinedRangeForm,
-)
+from Product.forms import TicketForm
 
-class IndexConsumablesView(TemplateView):
-    template_name = 'product/index_consumables.html'
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-## --------------------------Handle------------------------##
+from io import BytesIO
+from django.http import HttpResponse
+from django.template.loader import get_template
+
+from xhtml2pdf import pisa
 
 
-class HandleCreateView(CreateView):
-    model = Handle
-    template_name = 'product/add_update/handle_add.html'
-    form_class = HandleForm
-    success_url = reverse_lazy('product:handles')
+def render_to_pdf(template_src, context_dict={}):
+    template = get_template(template_src)
+
+    html = template.render(context_dict)
+    result = BytesIO()
+    pdf = pisa.pisaDocument(BytesIO(html.encode("utf-8")), result)
+    if not pdf.err:
+        return HttpResponse(result.getvalue(), content_type='application/pdf')
+    return None
+
+class TicketCreateView(CreateView):
+    model = Ticket
+    template_name = 'product/add_update/ticket_add.html'
+    form_class = TicketForm
+    success_url = reverse_lazy('product:tickets')
 
     @method_decorator(login_required(login_url=reverse_lazy('login')))
     def dispatch(self, *args, **kwargs):
@@ -51,13 +52,13 @@ class HandleCreateView(CreateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter un Nouveau Cordon'
+        context["form_name"] = 'Ajouter un Nouveau Ticket'
         return context
 
-class HandleUpdateView(UpdateView):
-    template_name = 'product/add_update/handle_add.html'
-    form_class = HandleForm
-    success_url = reverse_lazy('product:handles')
+class TicketUpdateView(UpdateView):
+    template_name = 'product/add_update/ticket_add.html'
+    form_class = TicketForm
+    success_url = reverse_lazy('product:tickets')
 
     @method_decorator(login_required(login_url=reverse_lazy('login')))
     def dispatch(self, *args, **kwargs):
@@ -65,85 +66,25 @@ class HandleUpdateView(UpdateView):
 
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour un Cordon'
+        context["form_name"] = 'Mettre à jour un Ticket'
         return context
 
     def get_object(self):
         _slug = self.kwargs.get('slug')
-        return get_object_or_404(Handle, slug=_slug)
+        return get_object_or_404(Ticket, slug=_slug)
 
-class HandleListView(ListView):
-    template_name = 'product/list/handle_list.html'
+class TicketListView(ListView):
+    template_name = 'product/list/ticket_list.html'
     # paginate_by = 10
-    queryset = Handle.objects.all()
+    queryset = Ticket.objects.all()
 
     @method_decorator(login_required(login_url=reverse_lazy('login')))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-class HandleDeleteView(DeleteView):
-    template_name = 'product/delete/handle_delete.html'
-    success_url = reverse_lazy('product:handles')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Handle, slug=_slug)
-
-#---------------------------End Handle------------------------##
-
-
-## --------------------------Labelling------------------------##
-
-
-class LabellingCreateView(CreateView):
-    model = Handle
-    template_name = 'product/add_update/labelling_add.html'
-    form_class = LabellingForm
-    success_url = reverse_lazy('product:labellings')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter un Nouveau Labelling'
-        return context
-
-class LabellingUpdateView(UpdateView):
-    template_name = 'product/add_update/labelling_add.html'
-    form_class = LabellingForm
-    success_url = reverse_lazy('product:labellings')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour un Labelling'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Labelling, slug=_slug)
-
-class LabellingListView(ListView):
-    template_name = 'product/list/labelling_list.html'
-    # paginate_by = 10
-    queryset = Labelling.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-class LabellingDeleteView(DeleteView):
-    template_name = 'product/delete/labelling_delete.html'
-    success_url = reverse_lazy('product:labellings')
+class TicketDeleteView(DeleteView):
+    template_name = 'product/delete/ticket_delete.html'
+    success_url = reverse_lazy('product:tickets')
 
     @method_decorator(login_required(login_url=reverse_lazy('login')))
     def dispatch(self, *args, **kwargs):
@@ -151,188 +92,14 @@ class LabellingDeleteView(DeleteView):
 
     def get_object(self):
         _slug = self.kwargs.get('slug')
-        return get_object_or_404(Labelling, slug=_slug)
+        return get_object_or_404(Ticket, slug=_slug)
 
-#---------------------------End Labelling------------------------##
+#---------------------------End Ticket------------------------##
 
+def ticket_sale_page(request):
+    tickets = Ticket.objects.all()
+    return render(request, 'product/list/tickets.html', context={'tickets': tickets})
 
-## --------------------------Packaging------------------------##
-
-
-class PackageCreateView(CreateView):
-    model = Package
-    template_name = 'product/add_update/package_add.html'
-    form_class = PackageForm
-    success_url = reverse_lazy('product:packages')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter un Nouvel Emballage'
-        return context
-
-class PackageUpdateView(UpdateView):
-    template_name = 'product/add_update/package_add.html'
-    form_class = PackageForm
-    success_url = reverse_lazy('product:packages')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour un Emballage'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Package, slug=_slug)
-
-class PackageListView(ListView):
-    template_name = 'product/list/package_list.html'
-    # paginate_by = 10
-    queryset = Package.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-class PackageDeleteView(DeleteView):
-    template_name = 'product/delete/package_delete.html'
-    success_url = reverse_lazy('product:packages')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Package, slug=_slug)
-
-#---------------------------End Packaging------------------------##
-
-## --------------------------Tape------------------------##
-
-
-class TapeCreateView(CreateView):
-    model = Tape
-    template_name = 'product/add_update/tape_add.html'
-    form_class = TapeForm
-    success_url = reverse_lazy('product:tapes')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter un Nouveau Scotch'
-        return context
-
-class TapeUpdateView(UpdateView):
-    template_name = 'product/add_update/tape_add.html'
-    form_class = TapeForm
-    success_url = reverse_lazy('product:tapes')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour un Scotch'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Tape, slug=_slug)
-
-class TapeListView(ListView):
-    template_name = 'product/list/tape_list.html'
-    # paginate_by = 10
-    queryset = Tape.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-class TapeDeleteView(DeleteView):
-    template_name = 'product/delete/tape_delete.html'
-    success_url = reverse_lazy('product:tapes')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Tape, slug=_slug)
-
-#---------------------------End Tape------------------------##
-
-
-#---------------------------Spare Parts------------------------##
-
-class PartCreateView(CreateView):
-    model = SparePart
-    template_name = 'product/add_update/part_add.html'
-    form_class = SparePartForm
-    success_url = reverse_lazy('product:parts')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Pièce de Rechange'
-        return context
-
-class PartUpdateView(UpdateView):
-    template_name = 'product/add_update/part_add.html'
-    form_class = SparePartForm
-    success_url = reverse_lazy('product:parts')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à Jour une Pièce de Rechange'
-        return context
-
-    def get_object(self):
-        _ref = self.kwargs.get('ref')
-        return get_object_or_404(SparePart, ref=_ref)
-
-class PartListView(ListView):
-    template_name = 'product/list/part_list.html'
-    # paginate_by = 10
-    queryset = SparePart.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-class PartDeleteView(DeleteView):
-    template_name = 'product/delete/part_delete.html'
-    success_url = reverse_lazy('product:parts')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _ref = self.kwargs.get('ref')
-        return get_object_or_404(SparePart, ref=_ref)
-
-
-#---------------------------End Spart Parts------------------------##
 
 class ProductIndexView(TemplateView):
     template_name = 'product/index.html'
@@ -341,542 +108,119 @@ class ProductIndexView(TemplateView):
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-# ##------------------------- Brand Views -------------------------##
+class ConsultingIndexView(TemplateView):
+    template_name = 'product/index_consulting.html'
 
-
-class BrandCreateView(CreateView):
-    model = Brand
-    template_name = 'product/add_update/brand_add.html'
-    form_class = BrandForm
-    success_url = reverse_lazy('product:brands')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
+    @ method_decorator(login_required(login_url=reverse_lazy('login')))
     def dispatch(self, *args, **kwargs):
         return super().dispatch(*args, **kwargs)
 
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Marque'
-        return context
-
-
-class BrandUpdateView(UpdateView):
-    template_name = 'product/add_update/brand_add.html'
-    form_class = BrandForm
-    success_url = reverse_lazy('product:brands')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à Jour une Marque'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Brand, slug=_slug)
-
-
-class BrandListView(ListView):
-    queryset = Brand.objects.all()
-    template_name = 'product/list/brand_list.html'
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class BrandDeleteView(DeleteView):
-    template_name = 'product/delete/brand_delete.html'
-    form_class = BrandForm
-    success_url = reverse_lazy('product:brands')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Brand, slug=_slug)
-
-# ##----------------------- End Brand Form -----------------------##
-
-# ##------------------------- Range Views -------------------------##
-
-
-class RangeCreateView(CreateView):
-    model = Range
-    template_name = 'product/add_update/range_add.html'
-    form_class = RangeForm
-    success_url = reverse_lazy('product:ranges')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Gamme'
-        return context
-
-
-class RangeUpdateView(UpdateView):
-    template_name = 'product/add_update/range_add.html'
-    form_class = RangeForm
-    success_url = reverse_lazy('product:ranges')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à Jour Une Gamme'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Range, slug=_slug)
-
-
-class RangeListView(ListView):
-    queryset = Range.objects.all()
-    template_name = 'product/list/range_list.html'
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class RangeDeleteView(DeleteView):
-    template_name = 'product/delete/range_delete.html'
-    form_class = RangeForm
-    success_url = reverse_lazy('product:ranges')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Range, slug=_slug)
-
-# ##----------------------- End Range Form -----------------------##
-
-
-# ##------------------------- Combined Range Views -------------------------##
-
-
-class CombinedRangeCreateView(CreateView):
-    model = CombinedRange
-    template_name = 'product/add_update/c_range_add.html'
-    form_class = CombinedRangeForm
-    success_url = reverse_lazy('product:c-ranges')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Gamme Combinée'
-        return context
-
-
-class CombinedRangeUpdateView(UpdateView):
-    template_name = 'product/add_update/c_range_add.html'
-    form_class = CombinedRangeForm
-    success_url = reverse_lazy('product:c-ranges')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à Jour Une Gamme Combinée'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(CombinedRange, slug=_slug)
-
-
-class CombinedRangeListView(ListView):
-    queryset = CombinedRange.objects.all()
-    template_name = 'product/list/c_range_list.html'
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class CombinedRangeDeleteView(DeleteView):
-    template_name = 'product/delete/c_range_delete.html'
-    form_class = RangeForm
-    success_url = reverse_lazy('product:c-ranges')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(CombinedRange, slug=_slug)
-
-# ##----------------------- End Combined Range Form -----------------------##
-
-
-##--------------------------- Color Form --------------------------##
-
-
-class ColorCreateView(CreateView):
-    model = Color
-    template_name = 'product/add_update/color_add.html'
-    form_class = ColorForm
-    success_url = reverse_lazy('product:colors')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Couleur'
-        return context
-
-
-class ColorUpdateView(UpdateView):
-    template_name = 'product/add_update/color_add.html'
-    form_class = ColorForm
-    success_url = reverse_lazy('product:colors')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour une Couleur'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Color, slug=_slug)
-
-
-class ColorListView(ListView):
-    queryset = Color.objects.all()
-    template_name = 'product/list/color_list.html'
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class ColorDeleteView(DeleteView):
-    template_name = 'product/delete/color_delete.html'
-    form_class = ColorForm
-    success_url = reverse_lazy('product:colors')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Color, slug=_slug)
-##------------------------- End color Form ------------------------##
-
-
-
-
-##--------------------------- Flavor Form --------------------------##
-
-
-class FlavorCreateView(CreateView):
-    model = Flavor
-    template_name = 'product/add_update/flavor_add.html'
-    form_class = FlavorForm
-    success_url = reverse_lazy('product:flavors')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter un Nouveau Parfum'
-        return context
-
-
-class FlavorUpdateView(UpdateView):
-    template_name = 'product/add_update/flavor_add.html'
-    form_class = FlavorForm
-    success_url = reverse_lazy('product:flavors')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour un Parfum'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Flavor, slug=_slug)
-
-
-class FlavorListView(ListView):
-    queryset = Flavor.objects.all()
-    template_name = 'product/list/flavor_list.html'
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class FlavorDeleteView(DeleteView):
-    template_name = 'product/delete/flavor_delete.html'
-    form_class = FlavorForm
-    success_url = reverse_lazy('product:flavors')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Flavor, slug=_slug)
-##------------------------- End Flavor Form ------------------------##
-
-
-##------------------------- Product Form ------------------------##
-
-
-class CoilCreateView(CreateView):
-    model = Coil
-    template_name = 'product/add_update/coil_add.html'
-    form_class = CoilTypeForm
-    success_url = reverse_lazy('product:coils')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Bobine'
-        return context
-
-
-class RawMatterCreateView(CreateView):
-    model = RawMatter
-    template_name = 'product/add_update/rawmatter_add.html'
-    form_class = RawMatterForm
-    success_url = reverse_lazy('product:rawmatters')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter une Nouvelle Matière Première'
-        return context
-
-
-class FinalProductCreateView(CreateView):
-    model = FinishedProductType
-    template_name = 'product/add_update/finalproduct_add.html'
-    form_class = FinalProductForm
-    success_url = reverse_lazy('product:products')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Ajouter un Nouveau Produit Fini'
-        return context
-
-
-class CoilUpdateView(UpdateView):
-    template_name = 'product/add_update/coil_add.html'
-    form_class = CoilTypeForm
-    success_url = reverse_lazy('product:coils')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à Jour une Bobine'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(CoilType, slug=_slug)
-
-
-class RawMatterUpdateView(UpdateView):
-    template_name = 'product/add_update/rawmatter_add.html'
-    form_class = RawMatterForm
-    success_url = reverse_lazy('product:rawmatters')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à Jour une Matière Première'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(RawMatter, slug=_slug)
-
-
-class FinalProductUpdateView(UpdateView):
-    template_name = 'product/add_update/finalproduct_add.html'
-    form_class = FinalProductForm
-    success_url = reverse_lazy('product:products')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_context_data(self, **kwargs):
-        context = super().get_context_data(**kwargs)
-        context["form_name"] = 'Mettre à jour un Produit Fini'
-        return context
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(FinishedProductType, slug=_slug)
-
-# class ConsumablesUpdateView(UpdateView):
-#     template_name = 'product/add_update/product_add.html'
-#     form_class = ConsumablesForm
-#     success_url = reverse_lazy('product:products')
-
-#     @method_decorator(login_required(login_url=reverse_lazy('login')))
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["form_name"] = 'Mettre a Jour une pièce consommable'
-#         return context
-
-#     def get_object(self):
-#         _slug = self.kwargs.get('slug')
-#         return get_object_or_404(Product, slug=_slug)
-
-# class SparePartsUpdateView(UpdateView):
-#     template_name = 'product/add_update/spareparts_add.html'
-#     form_class = SparePartsForm
-#     success_url = reverse_lazy('product:products')
-
-#     @method_decorator(login_required(login_url=reverse_lazy('login')))
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-
-#     def get_context_data(self, **kwargs):
-#         context = super().get_context_data(**kwargs)
-#         context["form_name"] = 'Mettre a Jour une pièce de rechange'
-#         return context
-
-#     def get_object(self):
-#         _slug = self.kwargs.get('slug')
-#         return get_object_or_404(Product, slug=_slug)
-
-
-class FinalProductListView(ListView):
-    #queryset = Product.objects.filter(category=Category.objects.get(name="produit finis").id)
-    template_name = 'product/list/final_product_list.html'
-    # paginate_by = 10
-    queryset = FinishedProductType.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class RawMatterListView(ListView):
-    template_name = 'product/list/raw_matter_list.html'
-    # paginate_by = 10
-    queryset = RawMatter.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-# class ConsumablesListView(ListView):
-#     template_name = 'product/list/consumables_list.html'
-#     paginate_by = 10
-
-#     def get_queryset(self):
-#         if Product.objects.all():
-#             try:
-#                 queryset = Product.objects.filter(category=Category.objects.get(name="pièce consommable").id)
-#             except:
-#                 messages.warning('test')
-#         else:
-#             queryset = Product.objects.none()
-#         return queryset
-
-#     @method_decorator(login_required(login_url=reverse_lazy('login')))
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-
-# class SparePartsListView(ListView):
-#     template_name = 'product/list/spare_parts_list.html'
-#     paginate_by = 10
-
-#     def get_queryset(self):
-#         if Product.objects.all():
-#             try:
-#                 queryset = Product.objects.filter(category=Category.objects.get(name="pièce de rechange").id)
-#             except:
-#                 messages.warning('test')
-#         else:
-#             queryset = Product.objects.none()
-#         return queryset
-
-#     @method_decorator(login_required(login_url=reverse_lazy('login')))
-#     def dispatch(self, *args, **kwargs):
-#         return super().dispatch(*args, **kwargs)
-
-
-class CoilListView(ListView):
-    template_name = 'product/list/coil_list.html'
-    # paginate_by = 10
-    queryset = CoilType.objects.all()
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-
-class ProductDeleteView(DeleteView):
-    template_name = 'product/delete/product_delete.html'
-    success_url = reverse_lazy('product:index')
-
-    @method_decorator(login_required(login_url=reverse_lazy('login')))
-    def dispatch(self, *args, **kwargs):
-        return super().dispatch(*args, **kwargs)
-
-    def get_object(self):
-        _slug = self.kwargs.get('slug')
-        return get_object_or_404(Product, slug=_slug)
-
-# ##-------------------------  End Product Form ------------------------##
+def ticket_sale(request, slug):
+    ticket = get_object_or_404(Ticket, slug=slug)
+    ticket_sale = TicketSale(date=timezone.now(), ticket = ticket, price = ticket.price)
+    ticket_sale.save()
+    template = loader.get_template('product/ticket.html')
+    try:
+        company = Company.objects.get(name='Theater')
+    except:
+        company = None
+    try:
+        company2 = Company.objects.get(name='Theater2')
+    except:
+        company2 = None
+    try:
+        company3 = Company.objects.get(name='Theater3')
+    except:
+        company3 = None
+    try:
+        company4 = Company.objects.get(name='Theater4')
+    except:
+        company4 = None
+    try:
+        company5 = Company.objects.get(name='Theater5')
+    except:
+        company5 = None
+    try:
+        company6 = Company.objects.get(name='Theater6')
+    except:
+        company6 = None
+    context = {
+        "ticket_sale": ticket_sale,
+        "company":company,
+        "company2":company2,
+        "company3":company3,
+        "company4":company4,
+        "company5":company5,
+        "company6":company6,
+    }
+    html = template.render(context)
+    pdf = render_to_pdf('product/ticket.html', context)
+    if pdf:
+        response = HttpResponse(pdf, content_type='application/pdf')
+        filename = "%s.pdf" % (ticket.ref)
+        content = "inline; filename='%s'" % (filename)
+        download = request.GET.get("download")
+        if download:
+            content = "attachment; filename='%s'" % (filename)
+        response['Content-Disposition'] = content
+        return response
+    return HttpResponse("Not found")
+
+class ReportingPage(View):
+    template_name = 'product/reporting_page.html'
+
+    def get(self, request):
+        return render(request, "product/reporting_page.html")
+
+def reporting(request):
+    current_time = None
+    if request.method == "GET":
+        
+        from_date = request.GET.get("from")
+        to_date = request.GET.get("to")
+        start_date = parse_date(from_date)
+        end_date = parse_date(to_date)
+        start_date = datetime.combine(start_date, datetime.min.time())
+        end_date = datetime.combine(end_date, datetime.min.time())
+
+        start_date = start_date.replace(hour = 0, minute = 0, second = 0, microsecond = 0)
+        end_date = end_date.replace(hour = 23, minute = 59, second = 59, microsecond = 0)
+
+        company = Company.objects.get(name ="Theater")
+        
+        ticket_sales = TicketSale.objects.filter(date__lte = end_date)
+        ticket_sales = ticket_sales.filter(date__gte = start_date)
+
+        tickets = Ticket.objects.all()
+
+        for i in range(tickets.__len__()):
+            tickets[i].calculated_sales_number = tickets[i].sales_number(start_date, end_date)
+            tickets[i].calculated_sales_value = tickets[i].sales_value(start_date, end_date)
+        
+        total_tickets_number = total_tickets_value = 0
+
+        total_tickets_number = ticket_sales.count()
+        for i in ticket_sales:
+            total_tickets_value += i.price
+
+        template = loader.get_template('product/reporting.html')
+        context = {
+            "start_date": start_date,
+            "end_date": end_date,
+            "tickets": tickets,
+            "total_tickets_number":total_tickets_number,
+            "total_tickets_value":total_tickets_value,
+            "company": company,
+        }
+        html = template.render(context)
+        pdf = render_to_pdf('product/reporting.html', context)
+        if pdf:
+            response = HttpResponse(pdf, content_type='application/pdf')
+            filename = "rapport de production_%s.pdf" % (timezone.now())
+            content = "inline; filename='%s'" % (filename)
+            download = request.GET.get("download")
+            if download:
+                content = "attachment; filename='%s'" % (filename)
+            response['Content-Disposition'] = content
+            return response
+        return HttpResponse("Not found")
